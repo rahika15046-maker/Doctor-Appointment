@@ -42,6 +42,7 @@ export default function App() {
   const [bookedAppointmentData, setBookedAppointmentData] = useState(null);
   const [bookedDoctorData, setBookedDoctorData] = useState(null);
   const [preselectedDoctorForBooking, setPreselectedDoctorForBooking] = useState(null);
+  const [preselectedServiceForBooking, setPreselectedServiceForBooking] = useState(null);
   const [notificationsModalOpen, setNotificationsModalOpen] = useState(false);
 
   // Filter params for FindDoctors
@@ -98,13 +99,14 @@ export default function App() {
     setDoctorProfileOpen(true);
   };
 
-  const handleStartBooking = (doctor = null) => {
+  const handleStartBooking = (doctor = null, service = null) => {
     if (!user) {
       setAuthModalMode('login');
       setAuthModalOpen(true);
       return;
     }
     setPreselectedDoctorForBooking(doctor);
+    setPreselectedServiceForBooking(service);
     setCurrentView('booking');
   };
 
@@ -146,6 +148,7 @@ export default function App() {
         return (
           <BookingFlow
             preselectedDoctor={preselectedDoctorForBooking}
+            preselectedService={preselectedServiceForBooking}
             allDoctors={allDoctors}
             onBookingSuccess={handleBookingCompleted}
             onCancel={() => setCurrentView('home')}
@@ -177,7 +180,7 @@ export default function App() {
       case 'services':
         return (
           <ServicesPage
-            onBookAppointment={handleStartBooking}
+            onBookAppointment={(srv) => handleStartBooking(null, srv)}
             onFindDoctor={(spec) => {
               setFindDoctorSpec(spec || 'All');
               setCurrentView('our-doctors');
@@ -298,7 +301,7 @@ export default function App() {
         doctor={selectedDoctorForProfile}
         isOpen={doctorProfileOpen}
         onClose={() => setDoctorProfileOpen(false)}
-        onBookAppointment={handleStartBooking}
+        onBookAppointment={(srv) => handleStartBooking(null, srv)}
       />
 
       {/* Booking Success Modal */}
@@ -325,3 +328,5 @@ export default function App() {
     </div>
   );
 }
+
+

@@ -1,6 +1,6 @@
 // Central API client for Medora Frontend
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
 
 export async function request(path, options = {}) {
   const { method = 'GET', body, headers = {}, ...customConfig } = options;
@@ -108,3 +108,4 @@ export const api = {
 };
 
 export default api;
+

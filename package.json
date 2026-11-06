@@ -1,0 +1,26 @@
+{
+  "name": "medora-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MEDORA Hospital - Enterprise Single-Hospital Healthcare & Appointment Booking Platform",
+  "scripts": {
+    "install:all": "npm install --prefix client && npm install --prefix server",
+    "build": "npm run build --prefix client",
+    "start": "node server/server.js",
+    "seed": "npm run seed --prefix server",
+    "test": "npm test --prefix server",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client"
+  },
+  "keywords": [
+    "medora",
+    "hospital",
+    "healthcare",
+    "doctor-appointment",
+    "mern",
+    "react",
+    "mongodb"
+  ],
+  "author": "Medora Hospital Development Team",
+  "license": "MIT"
+}

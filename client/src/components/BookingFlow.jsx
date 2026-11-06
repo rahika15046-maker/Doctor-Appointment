@@ -21,6 +21,7 @@ import {
   StethoscopeIcon3D,
   Shield3DIcon,
 } from './Icons3D';
+import { getService3DIcon } from './ServicesPage';
 import api from '../services/api';
 
 export default function BookingFlow({
@@ -78,6 +79,17 @@ export default function BookingFlow({
   // Status
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Sync with prop changes
+  useEffect(() => {
+    if (preselectedDoctor) {
+      setSelectedDoctor(preselectedDoctor);
+      setStep(3);
+    } else if (preselectedService) {
+      setSelectedService(preselectedService);
+      setStep(2);
+    }
+  }, [preselectedDoctor, preselectedService]);
 
   // 1. Load Medora Hospital Services
   useEffect(() => {
@@ -549,7 +561,7 @@ export default function BookingFlow({
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            {renderServiceIcon(srv.icon)}
+                            {getService3DIcon(srv, 44)}
                             <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#0D9488', backgroundColor: '#F0FDFA', padding: '3px 8px', borderRadius: 6 }}>
                               From ₹{srv.startingPrice}
                             </span>

@@ -1,1 +1,1 @@
-import './seed-atlas.js';
+import './sync-medora-atlas.js';
