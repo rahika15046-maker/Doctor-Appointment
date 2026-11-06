@@ -243,17 +243,14 @@ r.patch('/auth/profile', requireAuth, wrap(async (req, res) => {
 // Specializations
 r.get('/specializations', (_req, res) => {
   const specs = [
-    { id: 'cardiology', name: 'Cardiology', icon: 'heart', description: 'Heart, valves and blood circulation specialists', doctorsCount: 4 },
-    { id: 'dermatology', name: 'Dermatology', icon: 'sparkles', description: 'Skin, hair, nails and aesthetic health', doctorsCount: 3 },
-    { id: 'neurology', name: 'Neurology', icon: 'brain', description: 'Brain, spinal cord and nervous system care', doctorsCount: 3 },
-    { id: 'pediatrics', name: 'Pediatrics', icon: 'baby', description: 'Infant, child and adolescent health care', doctorsCount: 5 },
-    { id: 'gynecology', name: 'Gynecology', icon: 'female', description: "Women's reproductive and maternal wellness", doctorsCount: 4 },
-    { id: 'dentistry', name: 'Dentistry', icon: 'smile', description: 'Teeth, gums, cosmetic and oral care', doctorsCount: 3 },
-    { id: 'general-medicine', name: 'General Medicine', icon: 'stethoscope', description: 'Primary health consultations & preventive wellness', doctorsCount: 6 },
-    { id: 'orthopedics', name: 'Orthopedics', icon: 'activity', description: 'Bones, joints, ligaments and sports injuries', doctorsCount: 4 },
+    { id: 'general-medicine', name: 'General Medicine', icon: 'stethoscope', description: 'Primary health consultations & preventive wellness', doctorsCount: 1 },
+    { id: 'cardiology', name: 'Cardiology', icon: 'heart', description: 'Heart, valves and blood circulation specialists', doctorsCount: 1 },
+    { id: 'orthopedics', name: 'Orthopedics', icon: 'activity', description: 'Bones, joints, ligaments and fracture surgery', doctorsCount: 1 },
+    { id: 'pediatrics', name: 'Pediatrics', icon: 'baby', description: 'Infant, child and adolescent healthcare', doctorsCount: 1 },
   ];
   res.json({ success: true, data: specs });
 });
+
 
 // Medora Hospital Services API
 r.get('/services', wrap(async (_req, res) => {

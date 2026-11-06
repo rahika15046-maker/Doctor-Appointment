@@ -1,10 +1,11 @@
 // server/scripts/sync-medora-atlas.js
-// Synchronizes MongoDB Atlas with official Medora Hospital doctors, services, and appointment slots.
+// Synchronizes MongoDB Atlas with Medora Hospital:
+// - Diagnostic Hospital Services: X-Ray, CT Scan, MRI Scan, Sonography, Blood Tests
+// - Limited, realistic specializations: General Medicine, Cardiology, Orthopedics, Pediatrics
 
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
@@ -16,7 +17,7 @@ console.log('Connecting to MongoDB Atlas...');
 await mongoose.connect(uri, { serverSelectionTimeoutMS: 10000 });
 console.log('Connected to MongoDB Atlas successfully!');
 
-// Define Mongoose Schemas matching Medora architecture
+// Schemas
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true },
@@ -99,7 +100,6 @@ const AppointmentSchema = new mongoose.Schema({
   medicalReports: [{ name: String, url: String, uploadedAt: Date }],
 }, { timestamps: true });
 
-// Models
 const User = mongoose.models.User || mongoose.model('User', UserSchema);
 const Doctor = mongoose.models.Doctor || mongoose.model('Doctor', DoctorSchema);
 const Service = mongoose.models.Service || mongoose.model('Service', ServiceSchema);
@@ -107,10 +107,9 @@ const AppointmentSlot = mongoose.models.AppointmentSlot || mongoose.model('Appoi
 const Appointment = mongoose.models.Appointment || mongoose.model('Appointment', AppointmentSchema);
 
 async function syncAtlas() {
-  console.log('\n--- 1. Syncing Users & Patient Account ---');
+  console.log('\n--- 1. Syncing Demo Patient Priya Sharma ---');
   const pw = await bcrypt.hash('Demo@1234', 10);
 
-  // Priya Sharma (Patient)
   let patient = await User.findOne({ email: 'patient@demo.medora' });
   if (!patient) {
     patient = await User.create({
@@ -139,163 +138,130 @@ async function syncAtlas() {
     console.log('✓ Verified patient: Priya Sharma');
   }
 
-  // Admin
-  let admin = await User.findOne({ email: 'admin@demo.medora' });
-  if (!admin) {
-    await User.create({
-      name: 'Admin Medora',
-      email: 'admin@demo.medora',
-      password: pw,
-      phone: '+91 90000 00000',
-      role: 'admin',
-      isActive: true,
-    });
-    console.log('✓ Created admin: Admin Medora');
-  }
-
-  console.log('\n--- 2. Syncing Medora Hospital Services (10 Services) ---');
+  console.log('\n--- 2. Syncing Hospital Diagnostic & Imaging Services ---');
   await Service.deleteMany({});
   
-  const servicesData = [
+  const diagnosticServices = [
     {
-      title: 'General Health & Primary Care',
-      specialization: 'General Medicine',
-      department: 'General Medicine',
-      description: 'Comprehensive primary care checkups, vital health reviews, chronic disease management, fever clinics, and preventative wellness consultations at Medora Hospital.',
-      overview: 'Our General Medicine department serves as the foundation of health management, offering expert diagnosis, evidence-based treatments, and individualized lifestyle guidance.',
-      benefits: ['Full body vitals screening & biometric analysis', 'Same-day e-prescription & digital health record', 'Complimentary 7-day post-consultation query support', 'Integrated pharmacy and pathology coordination'],
-      features: ['Full body vitals screening', 'Digital prescription', 'Prescription medicine review', 'Free 7-day follow-up'],
-      icon: 'stethoscope',
+      title: 'Digital X-Ray (High-Resolution Radiography)',
+      specialization: 'Radiology',
+      department: 'Radiology & Diagnostic Imaging',
+      description: 'Advanced digital radiography for chest, bones, joints, spine, and abdominal diagnostics with instant high-clarity radiologist interpretation.',
+      overview: 'Medora Hospital’s Radiology Department is equipped with low-dose digital radiography systems offering rapid, high-precision skeletal and pulmonary diagnosis.',
+      benefits: [
+        'Ultra-low radiation dosage exposure',
+        'Immediate digital film preview & instant radiologist analysis',
+        'Direct integration with patient portal for quick retrieval',
+        'Available 24/7 for acute trauma and routine checks'
+      ],
+      features: ['Immediate digital imaging', 'Certified radiologist report', 'Low radiation technology', 'Available 24x7'],
+      icon: 'xray',
       startingPrice: 600,
       currency: 'INR',
       popular: true,
     },
     {
-      title: 'Cardiology & Advanced Heart Care',
-      specialization: 'Cardiology',
-      department: 'Cardiology',
-      description: 'Advanced non-invasive cardiac evaluation, digital 12-lead ECG review, 2D Echo triage, blood pressure optimization, and lipid management by Medora Hospital heart specialists.',
-      overview: 'Dedicated to cardiac excellence, our cardiologists utilize state-of-the-art diagnostic protocols to detect, manage, and prevent cardiovascular conditions.',
-      benefits: ['12-lead digital ECG and rhythm analysis', 'Cardiovascular risk stratification', 'Hypertension & lipid management protocols', 'Direct admission pathway for emergency care'],
-      features: ['Resting ECG interpretation', 'Cardiovascular risk score', 'Lifestyle & diet guidance', 'Emergency referral triage'],
-      icon: 'heart',
+      title: 'CT Scan (Computed Tomography 128-Slice)',
+      specialization: 'Radiology',
+      department: 'Radiology & Diagnostic Imaging',
+      description: 'Ultra-fast sub-second multi-slice CT scanning for brain, chest, abdomen, pelvis, and angiography with 3D multi-planar reconstruction.',
+      overview: 'Our 128-slice CT scanner delivers volumetric cross-sectional imaging for prompt emergency evaluation of stroke, trauma, chest anomalies, and internal pathologies.',
+      benefits: [
+        'High-speed scanning in seconds with minimum breath-hold',
+        'Sub-millimeter slice resolution with 3D vascular reconstruction',
+        'Non-ionic safe contrast administration with kidney protection check',
+        'Certified senior radiologist emergency review'
+      ],
+      features: ['128-Slice rapid scan', '3D Multi-planar reconstruction', 'Emergency stroke triage', 'High diagnostic accuracy'],
+      icon: 'ctscan',
+      startingPrice: 2500,
+      currency: 'INR',
+      popular: true,
+    },
+    {
+      title: 'MRI Scan (Magnetic Resonance 1.5 Tesla)',
+      specialization: 'Radiology',
+      department: 'Radiology & Diagnostic Imaging',
+      description: 'High-field 1.5 Tesla silent MRI scanning for brain, neuro-spine, joints, musculoskeletal conditions, and soft tissue diagnostics without radiation.',
+      overview: 'Experience silent, comfortable, radiation-free neuro and musculoskeletal imaging with Medora Hospital’s high-field Magnetic Resonance system.',
+      benefits: [
+        'Zero ionizing radiation exposure',
+        'Superior soft-tissue contrast for brain, spine, ligaments, and joints',
+        'Acoustic noise reduction technology for enhanced patient comfort',
+        'Comprehensive sub-specialty neuro & musculoskeletal reporting'
+      ],
+      features: ['Silent scan technology', 'Zero radiation exposure', 'High-definition soft tissue', 'Expert neuro-radiology review'],
+      icon: 'mriscan',
+      startingPrice: 4000,
+      currency: 'INR',
+      popular: true,
+    },
+    {
+      title: 'Ultrasound Sonography (USG & 4D Color Doppler)',
+      specialization: 'Radiology',
+      department: 'Radiology & Diagnostic Imaging',
+      description: 'Safe acoustic sound wave imaging for whole abdomen, pelvis, KUB, thyroid, musculoskeletal, and vascular color Doppler assessments.',
+      overview: 'Our advanced ultrasound suite delivers high-frequency real-time imaging for abdominal organs, maternal wellness, thyroid profiling, and vascular blood flow.',
+      benefits: [
+        'Completely safe, non-invasive acoustic sound wave diagnostic',
+        'High-resolution color Doppler for arterial & venous blood flow',
+        'Immediate bedside printout and digital video recording',
+        'Comfortable examination conducted by experienced sonologists'
+      ],
+      features: ['Color Doppler imaging', 'Non-invasive & radiation free', 'Immediate digital report', 'Conducted by certified MD sonologist'],
+      icon: 'sonography',
       startingPrice: 1200,
       currency: 'INR',
       popular: true,
     },
     {
-      title: 'Dermatology & Skin Aesthetics',
-      specialization: 'Dermatology',
-      department: 'Dermatology',
-      description: 'Specialized clinical dermatology for acne, eczema, psoriasis, hair loss, laser consultations, and advanced allergy diagnostics in Medora Hospital’s Skin Suite.',
-      overview: 'Combining medical dermatology and aesthetic care, our dermatologists treat skin, hair, and nail conditions using certified protocols and clinical technologies.',
-      benefits: ['High-resolution dermoscopy and skin barrier analysis', 'Individualized acne, eczema, and psoriasis roadmaps', 'Clinical trichology assessments for hair health', 'Safe, medical-grade laser and aesthetic consultations'],
-      features: ['Skin barrier analysis', 'Acne treatment plans', 'Hair follicle health audit', 'Allergy testing guidance'],
-      icon: 'sparkles',
-      startingPrice: 900,
-      currency: 'INR',
-      popular: false,
-    },
-    {
-      title: 'Neurology & Brain Sciences',
-      specialization: 'Neurology',
-      department: 'Neurology',
-      description: 'Expert neurological evaluations for migraines, chronic headaches, neuropathy, vertigo, seizure disorders, and post-stroke rehabilitation triage.',
-      overview: 'Our neurology specialists deliver advanced diagnostics and therapeutic management for complex central and peripheral nervous system disorders.',
-      benefits: ['Specialized chronic migraine and headache profiling', 'Comprehensive nerve conduction and reflex testing', 'Sleep disorder and cognitive wellness reviews', 'Targeted neuro-rehabilitation care plans'],
-      features: ['Reflex & motor function test', 'Migraine trigger mapping', 'Sleep disorder review', 'Cognitive wellness assessment'],
-      icon: 'brain',
-      startingPrice: 1500,
-      currency: 'INR',
-      popular: true,
-    },
-    {
-      title: 'Orthopedics & Joint Care',
-      specialization: 'Orthopedics',
-      department: 'Orthopedics',
-      description: 'Bone density evaluation, joint pain management, sports injury rehabilitation, arthritis triage, and minimally invasive surgical consultations.',
-      overview: 'From sports injuries to degenerative arthritis, Medora’s orthopedic team delivers precision diagnostic care, joint preservation strategies, and physical rehabilitation.',
-      benefits: ['Detailed joint mobility and range-of-motion assessments', 'Digital X-ray, CT, and MRI evaluations', 'Personalized physical rehabilitation and physiotherapy roadmaps', 'Ergonomic guidance for desk and athletic health'],
-      features: ['Range-of-motion audit', 'X-ray / MRI review', 'Physical rehab roadmap', 'Ergonomic advisory'],
-      icon: 'activity',
-      startingPrice: 1100,
-      currency: 'INR',
-      popular: false,
-    },
-    {
-      title: 'Pediatrics & Child Healthcare',
-      specialization: 'Pediatrics',
-      department: 'Pediatrics',
-      description: 'Child wellness assessments, infant growth milestones, pediatric nutrition, and complete WHO/IAP vaccination schedules in Medora Hospital’s child-friendly wing.',
-      overview: 'Providing compassionate care from birth through adolescence, our pediatric team ensures your child’s optimal physical, cognitive, and emotional development.',
-      benefits: ['Growth percentile and developmental tracking', 'Cold-chain certified WHO and IAP vaccination schedules', 'Pediatric allergy and nutrition guidance', 'Direct access to pediatric emergency care'],
-      features: ['Growth percentile chart', 'Vaccination certificate', 'Diet & lactation counselling', 'Pediatric emergency triage'],
-      icon: 'baby',
+      title: 'Comprehensive Blood Tests & Pathology Panel',
+      specialization: 'Pathology',
+      department: 'Pathology & Diagnostic Laboratory',
+      description: 'NABL-accredited automated pathology tests including Complete Blood Count (CBC), Lipid Profile, Liver (LFT), Kidney (KFT), Thyroid (T3/T4/TSH), and HbA1c.',
+      overview: 'Medora Hospital’s fully automated pathology laboratory processes blood samples using barcode verification to ensure verified results delivered within 12 hours.',
+      benefits: [
+        'NABL accredited automated robotic sample analyzers',
+        'Complete metabolic health audit (CBC, LFT, KFT, Lipids, Blood Sugar)',
+        'Digital pathology report delivered to patient portal in 12 hours',
+        'Complimentary consulting doctor interpretation support'
+      ],
+      features: ['Automated barcode processing', 'Report ready in 12 hours', 'Home collection available', 'Consulting physician review'],
+      icon: 'bloodtest',
       startingPrice: 800,
       currency: 'INR',
-      popular: false,
-    },
-    {
-      title: 'Gynecology & Women’s Health',
-      specialization: 'Gynecology',
-      department: 'Gynecology',
-      description: 'Antenatal care, PCOS/PCOD management, hormonal health, cervical screenings, and personalized family planning guidance in a confidential, supportive clinic.',
-      overview: 'Dedicated to women across all life stages, our gynecology department provides empathetic care covering preventive screening, hormonal balance, and maternal care.',
-      benefits: ['High-resolution pelvic ultrasound and pap smear reviews', 'Structured PCOS/PCOD metabolic lifestyle programs', 'Comprehensive prenatal and antenatal health roadmaps', 'Confidential and compassionate clinical environment'],
-      features: ['Pelvic ultrasound review', 'Hormonal balance panel', 'Prenatal nutrition advice', 'Confidential consultation'],
-      icon: 'female',
-      startingPrice: 1000,
-      currency: 'INR',
       popular: true,
-    },
-    {
-      title: 'Dental Care & Oral Surgery',
-      specialization: 'Dentistry',
-      department: 'Dental Care',
-      description: 'Digital smile design, painless root canals, teeth alignment, dental scaling, cavity prevention, and surgical extractions in our modern dental operatory.',
-      overview: 'Our dental suite at Medora Hospital offers restorative, preventative, and cosmetic oral healthcare delivered with advanced sterile instrumentation.',
-      benefits: ['High-definition intraoral camera diagnostics', 'Painless single-sitting root canal treatment options', 'Ultrasonic dental scaling and enamel protection', 'Transparent pricing with take-home oral care kits'],
-      features: ['Intraoral camera examination', 'Digital dental mapping', 'Enamel polish & cleaning', 'Post-procedure care kit'],
-      icon: 'tooth',
-      startingPrice: 700,
-      currency: 'INR',
-      popular: false,
-    },
-    {
-      title: 'Diagnostics & Laboratory Services',
-      specialization: 'Diagnostics and Laboratory',
-      department: 'Diagnostics',
-      description: 'NABL-accredited diagnostic testing including complete metabolic panels, thyroid profiles, lipid panels, urine cytology, and digital radiology.',
-      overview: 'Equipped with cutting-edge automated analyzers, Medora Hospital’s pathology and diagnostic laboratory delivers precise results within hours.',
-      benefits: ['Automated barcoded specimen processing', 'Verified digital reports delivered via patient portal within 12-24 hours', 'Doctor review included with abnormal laboratory values', 'Strict international quality assurance standards'],
-      features: ['NABL accredited lab processing', 'Digital report in 12 hours', 'Barcode tracking', 'Consulting doctor review'],
-      icon: 'activity',
-      startingPrice: 500,
-      currency: 'INR',
-      popular: true,
-    },
-    {
-      title: 'Physiotherapy & Rehabilitation',
-      specialization: 'Physiotherapy',
-      department: 'Physiotherapy',
-      description: 'Evidence-based physical therapy for post-surgical recovery, chronic back and neck pain, sports rehabilitation, and ergonomic realignment.',
-      overview: 'Our experienced physical therapists help restore strength, mobility, and functional independence through tailored therapeutic exercise and modalities.',
-      benefits: ['Targeted musculoskeletal and postural assessment', 'Manual therapy and therapeutic ultrasound modalities', 'Home exercise program with video instructions', 'Accelerated recovery timelines for sports injuries'],
-      features: ['Targeted physical assessment', 'Modalities & manual therapy', 'Home exercise guide', 'Post-surgical rehab'],
-      icon: 'activity',
-      startingPrice: 750,
-      currency: 'INR',
-      popular: false,
     },
   ];
 
-  const createdServices = await Service.insertMany(servicesData);
-  console.log(`✓ Inserted ${createdServices.length} Medora Hospital services into MongoDB Atlas.`);
+  const createdServices = await Service.insertMany(diagnosticServices);
+  console.log(`✓ Inserted ${createdServices.length} Medora Hospital diagnostic services into MongoDB Atlas.`);
 
-  console.log('\n--- 3. Syncing Medora Hospital Doctors (8 Doctors) ---');
+  console.log('\n--- 3. Syncing Medora Core Hospital Specialists (4 Specializations) ---');
   await Doctor.deleteMany({});
 
-  const doctorsList = [
+  const coreDoctors = [
+    {
+      name: 'Dr. Robert Brown',
+      email: 'robert.brown@demo.medora',
+      specialization: 'General Medicine',
+      department: 'General Health & Primary Care',
+      designation: 'Lead Consultant - Internal Medicine & Primary Care',
+      servicesOffered: ['General Medicine', 'Executive Health Checkup', 'Diabetes Clinic', 'Acute Illness Care'],
+      qualification: 'MBBS, MD - Internal Medicine (Gold Medalist)',
+      experience: 16,
+      hospital: 'Medora Hospital',
+      firstVisitFee: 600,
+      followupFee: 400,
+      consultationFee: 600,
+      currency: 'INR',
+      averageRating: 4.8,
+      reviewsCount: 2750,
+      avatar: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&q=80&w=600',
+      about: 'Dr. Robert Brown leads Medora Hospital’s Internal Medicine Division with over 16 years of experience managing acute illnesses, fever syndromes, lifestyle disorders, and chronic disease protocols.',
+      consultationTypes: ['IN_PERSON', 'ONLINE'],
+      workingDays: [1, 2, 3, 4, 5, 6],
+    },
     {
       name: 'Dr. Sarah Johnson',
       email: 'sarah.johnson@demo.medora',
@@ -310,61 +276,19 @@ async function syncAtlas() {
       followupFee: 700,
       consultationFee: 1200,
       currency: 'INR',
-      averageRating: 4.8,
+      averageRating: 4.9,
       reviewsCount: 2164,
       avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=600',
-      about: 'Dr. Sarah Johnson leads Medora Hospital’s Cardiology Department with 15+ years of specialized clinical experience in preventative cardiology, hypertension, arrhythmia, and comprehensive cardiac rehabilitation.',
+      about: 'Dr. Sarah Johnson leads Medora Hospital’s Cardiology Pavilion with specialized clinical expertise in preventative cardiology, hypertension, arrhythmia management, and cardiac wellness.',
       consultationTypes: ['IN_PERSON', 'ONLINE'],
       workingDays: [1, 2, 3, 4, 5, 6],
-    },
-    {
-      name: 'Dr. Michael Chen',
-      email: 'michael.chen@demo.medora',
-      specialization: 'Dermatology',
-      department: 'Dermatology & Skin Aesthetics',
-      designation: 'Lead Consultant Dermatologist',
-      servicesOffered: ['Dermatology', 'Skin Barrier Diagnostics', 'Laser Therapy', 'Acne & Eczema Care'],
-      qualification: 'MBBS, MD - Dermatology & Venereology',
-      experience: 10,
-      hospital: 'Medora Hospital',
-      firstVisitFee: 900,
-      followupFee: 550,
-      consultationFee: 900,
-      currency: 'INR',
-      averageRating: 4.7,
-      reviewsCount: 1840,
-      avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=600',
-      about: 'Dr. Michael Chen specializes in medical and aesthetic dermatology at Medora Hospital, addressing chronic dermatitis, psoriasis, scalp disorders, and advanced dermato-cosmetic therapies.',
-      consultationTypes: ['IN_PERSON', 'ONLINE'],
-      workingDays: [1, 2, 3, 4, 5],
-    },
-    {
-      name: 'Dr. Emily Davis',
-      email: 'emily.davis@demo.medora',
-      specialization: 'Neurology',
-      department: 'Neurology & Brain Sciences',
-      designation: 'Director of Neurology & Senior Neuro-Specialist',
-      servicesOffered: ['Neurology', 'Migraine Care', 'Epilepsy Clinic', 'Cognitive Assessment'],
-      qualification: 'MBBS, MD, DM - Neurology',
-      experience: 14,
-      hospital: 'Medora Hospital',
-      firstVisitFee: 1500,
-      followupFee: 900,
-      consultationFee: 1500,
-      currency: 'INR',
-      averageRating: 4.9,
-      reviewsCount: 2410,
-      avatar: 'https://images.unsplash.com/photo-1594824813512-588147321200?auto=format&fit=crop&q=80&w=600',
-      about: 'Dr. Emily Davis directs neurological consultations at Medora Hospital, focusing on migraine protocols, neuropathies, stroke management, and sleep and movement disorders.',
-      consultationTypes: ['IN_PERSON', 'ONLINE'],
-      workingDays: [1, 2, 3, 4, 5],
     },
     {
       name: 'Dr. James Wilson',
       email: 'james.wilson@demo.medora',
       specialization: 'Orthopedics',
       department: 'Orthopedics & Joint Care',
-      designation: 'Chief Orthopedic Surgeon',
+      designation: 'Chief Orthopedic & Joint Surgeon',
       servicesOffered: ['Orthopedics', 'Joint Preservation', 'Sports Injury Clinic', 'Spine Assessment'],
       qualification: 'MBBS, MS - Orthopedic Surgery, MCh',
       experience: 11,
@@ -376,7 +300,7 @@ async function syncAtlas() {
       averageRating: 4.8,
       reviewsCount: 1920,
       avatar: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=600',
-      about: 'Dr. James Wilson is a renowned orthopedic surgeon at Medora Hospital, known for minimally invasive joint reconstruction, sports medicine, arthritis care, and spinal health.',
+      about: 'Dr. James Wilson directs Medora Hospital’s Orthopedic Department, specializing in minimally invasive joint surgery, fracture trauma care, sports injury rehabilitation, and arthritis management.',
       consultationTypes: ['IN_PERSON', 'ONLINE'],
       workingDays: [1, 2, 3, 4, 5],
     },
@@ -385,7 +309,7 @@ async function syncAtlas() {
       email: 'anita.desai@demo.medora',
       specialization: 'Pediatrics',
       department: 'Pediatrics & Child Healthcare',
-      designation: 'Head of Pediatric Medicine & Neonatology',
+      designation: 'Head of Pediatric Medicine & Child Healthcare',
       servicesOffered: ['Pediatrics', 'Well-Baby Clinic', 'Childhood Immunization', 'Nutritional Triage'],
       qualification: 'MBBS, DCH, MD - Pediatrics',
       experience: 12,
@@ -397,70 +321,7 @@ async function syncAtlas() {
       averageRating: 4.9,
       reviewsCount: 3100,
       avatar: 'https://images.unsplash.com/photo-1614608682850-e0d6ed316d47?auto=format&fit=crop&q=80&w=600',
-      about: 'Dr. Anita Desai heads Medora Hospital’s Pediatric Pavilion, offering compassionate care for infants, adolescents, developmental monitoring, and preventive immunizations.',
-      consultationTypes: ['IN_PERSON', 'ONLINE'],
-      workingDays: [1, 2, 3, 4, 5, 6],
-    },
-    {
-      name: 'Dr. Rachel Adams',
-      email: 'rachel.adams@demo.medora',
-      specialization: 'Gynecology',
-      department: 'Gynecology & Women’s Health',
-      designation: 'Chief Consultant - Obstetrics & Gynecology',
-      servicesOffered: ['Gynecology', 'Antenatal Wellness', 'PCOS/PCOD Care', 'Menopause Clinic'],
-      qualification: 'MBBS, MS - Obstetrics & Gynecology, FICOG',
-      experience: 13,
-      hospital: 'Medora Hospital',
-      firstVisitFee: 1000,
-      followupFee: 600,
-      consultationFee: 1000,
-      currency: 'INR',
-      averageRating: 4.8,
-      reviewsCount: 2300,
-      avatar: 'https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&q=80&w=600',
-      about: 'Dr. Rachel Adams provides specialized obstetric and gynecological care at Medora Hospital, focusing on maternal wellness, hormonal balance, laparoscopic treatments, and preventative oncology screening.',
-      consultationTypes: ['IN_PERSON', 'ONLINE'],
-      workingDays: [1, 2, 3, 4, 5],
-    },
-    {
-      name: 'Dr. David Kumar',
-      email: 'david.kumar@demo.medora',
-      specialization: 'Dentistry',
-      department: 'Dental Care & Oral Surgery',
-      designation: 'Chief Dental & Maxillofacial Surgeon',
-      servicesOffered: ['Dentistry', 'Cosmetic Smile Design', 'Endodontics', 'Dental Implants'],
-      qualification: 'BDS, MDS - Oral & Maxillofacial Surgery',
-      experience: 9,
-      hospital: 'Medora Hospital',
-      firstVisitFee: 700,
-      followupFee: 450,
-      consultationFee: 700,
-      currency: 'INR',
-      averageRating: 4.7,
-      reviewsCount: 1540,
-      avatar: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=600',
-      about: 'Dr. David Kumar leads Medora Hospital’s Dental Suite, offering pain-free root canals, digital tooth restoration, surgical extractions, and cosmetic dentistry.',
-      consultationTypes: ['IN_PERSON', 'ONLINE'],
-      workingDays: [1, 2, 3, 4, 5, 6],
-    },
-    {
-      name: 'Dr. Robert Brown',
-      email: 'robert.brown@demo.medora',
-      specialization: 'General Medicine',
-      department: 'General Health & Primary Care',
-      designation: 'Lead Consultant - Internal Medicine & Preventive Health',
-      servicesOffered: ['General Medicine', 'Executive Health Checkup', 'Diabetes Clinic', 'Acute Illness Care'],
-      qualification: 'MBBS, MD - Internal Medicine',
-      experience: 16,
-      hospital: 'Medora Hospital',
-      firstVisitFee: 600,
-      followupFee: 400,
-      consultationFee: 600,
-      currency: 'INR',
-      averageRating: 4.8,
-      reviewsCount: 2750,
-      avatar: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&q=80&w=600',
-      about: 'Dr. Robert Brown has served as a senior physician at Medora Hospital for over 16 years, treating adult acute conditions, metabolic syndromes, lifestyle disorders, and geriatrics.',
+      about: 'Dr. Anita Desai heads Medora Hospital’s Pediatric Wing, providing compassionate care for infants and children, developmental tracking, pediatric nutrition, and WHO cold-chain vaccinations.',
       consultationTypes: ['IN_PERSON', 'ONLINE'],
       workingDays: [1, 2, 3, 4, 5, 6],
     },
@@ -470,7 +331,7 @@ async function syncAtlas() {
   const allSlotsToInsert = [];
   const createdDoctors = [];
 
-  for (const docData of doctorsList) {
+  for (const docData of coreDoctors) {
     let u = await User.findOne({ email: docData.email });
     if (!u) {
       u = await User.create({
@@ -540,17 +401,10 @@ async function syncAtlas() {
   await AppointmentSlot.insertMany(allSlotsToInsert);
   console.log(`✓ Created ${allSlotsToInsert.length} availability slots in MongoDB Atlas.`);
 
-  console.log('\n--- 5. Verifying Database Collections Summary ---');
-  const db = mongoose.connection.db;
-  const collections = await db.listCollections().toArray();
-  for (const c of collections) {
-    const count = await db.collection(c.name).countDocuments();
-    console.log(`- ${c.name}: ${count} documents`);
-  }
-
   console.log('\n======================================================');
   console.log('🎉 MONGODB ATLAS SYNCHRONIZATION COMPLETE!');
-  console.log('All doctors, services, and live slots belong to Medora Hospital.');
+  console.log('Services: X-Ray, CT Scan, MRI Scan, Sonography, Blood Tests');
+  console.log('Specializations: General Medicine, Cardiology, Orthopedics, Pediatrics');
   console.log('======================================================\n');
 
   await mongoose.disconnect();

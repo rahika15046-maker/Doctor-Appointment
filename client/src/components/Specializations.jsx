@@ -1,20 +1,39 @@
 import React from 'react';
-import { SPECIALTY_3D_MAP, StethoscopeIcon3D } from './Icons3D';
+import {
+  HeartIcon3D,
+  StethoscopeIcon3D,
+  ActivityIcon3D,
+  BabyIcon3D,
+} from './Icons3D';
 import { ArrowRightIcon } from './Icons';
 
 export default function Specializations({ specializations = [], selectedSpec, onSelectSpec, onViewAll }) {
   const defaultSpecs = [
-    { id: 'cardiology', name: 'Cardiology', desc: 'Heart & Vascular' },
-    { id: 'dermatology', name: 'Dermatology', desc: 'Skin & Aesthetics' },
-    { id: 'neurology', name: 'Neurology', desc: 'Brain & Nerves' },
-    { id: 'pediatrics', name: 'Pediatrics', desc: 'Child Healthcare' },
-    { id: 'gynecology', name: 'Gynecology', desc: "Women's Health" },
-    { id: 'dentistry', name: 'Dentistry', desc: 'Dental & Smile' },
-    { id: 'general-medicine', name: 'General Medicine', desc: 'Family Medicine' },
-    { id: 'orthopedics', name: 'Orthopedics', desc: 'Bone & Joints' },
+    {
+      id: 'general-medicine',
+      name: 'General Medicine',
+      desc: 'Primary health consultations, fever clinic & preventive wellness',
+      icon: <StethoscopeIcon3D size={56} />,
+    },
+    {
+      id: 'cardiology',
+      name: 'Cardiology',
+      desc: 'Heart care, hypertension, ECG & cardiovascular wellness',
+      icon: <HeartIcon3D size={56} />,
+    },
+    {
+      id: 'orthopedics',
+      name: 'Orthopedics',
+      desc: 'Bones, joints, sports trauma & fracture management',
+      icon: <ActivityIcon3D size={56} />,
+    },
+    {
+      id: 'pediatrics',
+      name: 'Pediatrics',
+      desc: 'Infant care, child development & cold-chain immunization',
+      icon: <BabyIcon3D size={56} />,
+    },
   ];
-
-  const items = specializations.length > 0 ? specializations : defaultSpecs;
 
   return (
     <section style={{
@@ -28,6 +47,8 @@ export default function Specializations({ specializations = [], selectedSpec, on
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         marginBottom: 32,
+        flexWrap: 'wrap',
+        gap: 16,
       }}>
         <div>
           <div style={{
@@ -41,7 +62,7 @@ export default function Specializations({ specializations = [], selectedSpec, on
             color: '#0D9488',
             marginBottom: 6,
           }}>
-            <span>✨ 3D Specialty Explorer</span>
+            <span>✨ Medora Clinical Specializations</span>
           </div>
           <h2 style={{
             fontSize: '2rem',
@@ -50,13 +71,13 @@ export default function Specializations({ specializations = [], selectedSpec, on
             letterSpacing: '-0.5px',
             marginBottom: 6,
           }}>
-            Our Specializations
+            Our Clinical Departments
           </h2>
           <p style={{
             fontSize: '0.96rem',
             color: '#64748B',
           }}>
-            Expert clinical consultations across leading medical disciplines
+            Dedicated in-house hospital medical departments with senior board-certified specialists
           </p>
         </div>
 
@@ -74,41 +95,72 @@ export default function Specializations({ specializations = [], selectedSpec, on
             gap: 6,
           }}
         >
-          <span>View All</span>
+          <span>Meet Our Doctors</span>
           <ArrowRightIcon size={16} />
         </button>
       </div>
 
-      {/* 3D Specialization Tiles Grid */}
+      {/* Grid of 4 Core Clinical Specializations */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(136px, 1fr))',
-        gap: 18,
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+        gap: 24,
       }}>
-        {items.map((spec) => {
-          const Icon3D = SPECIALTY_3D_MAP[spec.id] || StethoscopeIcon3D;
-          const isSelected = selectedSpec === spec.name;
-
+        {defaultSpecs.map((item) => {
+          const isSelected = selectedSpec === item.name;
           return (
             <div
-              key={spec.id || spec.name}
-              onClick={() => onSelectSpec(spec.name)}
-              className={`specialty-tile-3d ${isSelected ? 'active' : ''}`}
+              key={item.id}
+              onClick={() => onSelectSpec && onSelectSpec(item.name)}
+              className="card-3d"
+              style={{
+                backgroundColor: isSelected ? '#F0FDFA' : '#FFFFFF',
+                borderRadius: 22,
+                padding: '28px 24px',
+                border: isSelected ? '2px solid #0D9488' : '1px solid #E2E8F0',
+                cursor: 'pointer',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                boxShadow: isSelected ? '0 12px 28px -6px rgba(13, 148, 136, 0.25)' : 'none',
+              }}
             >
-              <Icon3D size={56} />
-              
-              <div style={{ textAlign: 'center' }}>
-                <div style={{
-                  fontSize: '0.92rem',
+              <div>
+                <div style={{ marginBottom: 18 }}>
+                  {item.icon}
+                </div>
+                <h3 style={{
+                  fontSize: '1.2rem',
                   fontWeight: 800,
-                  color: isSelected ? '#0F766E' : '#1E293B',
-                  marginBottom: 2,
+                  color: isSelected ? '#0D9488' : '#0F172A',
+                  marginBottom: 8,
                 }}>
-                  {spec.name}
-                </div>
-                <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 500 }}>
-                  {spec.desc || 'Specialists'}
-                </div>
+                  {item.name}
+                </h3>
+                <p style={{
+                  fontSize: '0.86rem',
+                  color: '#64748B',
+                  lineHeight: 1.5,
+                  marginBottom: 16,
+                }}>
+                  {item.desc}
+                </p>
+              </div>
+
+              <div style={{
+                paddingTop: 12,
+                borderTop: '1px solid #F1F5F9',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0D9488' }}>
+                  Consult Specialist
+                </span>
+                <span style={{ fontSize: '0.82rem', color: '#0D9488' }}>
+                  →
+                </span>
               </div>
             </div>
           );

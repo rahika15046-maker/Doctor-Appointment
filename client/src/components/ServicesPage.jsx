@@ -13,38 +13,32 @@ import {
   XIcon,
 } from './Icons';
 import {
+  XRayIcon3D,
+  CtScanIcon3D,
+  MriScanIcon3D,
+  SonographyIcon3D,
+  BloodTestIcon3D,
   HeartIcon3D,
-  SparklesIcon3D,
   BrainIcon3D,
-  BabyIcon3D,
-  FemaleIcon3D,
-  ToothIcon3D,
   StethoscopeIcon3D,
   ActivityIcon3D,
   Hospital3DIcon,
-  Video3DIcon,
-  Shield3DIcon,
-  Clock3DIcon,
 } from './Icons3D';
 import api from '../services/api';
 
 export function getService3DIcon(service, size = 52) {
   const text = `${service?.icon || ''} ${service?.title || ''} ${service?.name || ''} ${service?.department || ''} ${service?.specialization || ''}`.toLowerCase();
   
+  if (text.includes('xray') || text.includes('x-ray') || text.includes('radiography')) return <XRayIcon3D size={size} />;
+  if (text.includes('ct') || text.includes('ctscan') || text.includes('computed')) return <CtScanIcon3D size={size} />;
+  if (text.includes('mri') || text.includes('resonance') || text.includes('mr scan')) return <MriScanIcon3D size={size} />;
+  if (text.includes('sonography') || text.includes('ultrasound') || text.includes('usg') || text.includes('doppler')) return <SonographyIcon3D size={size} />;
+  if (text.includes('blood') || text.includes('patholog') || text.includes('cbc') || text.includes('lipid') || text.includes('lab') || text.includes('test')) return <BloodTestIcon3D size={size} />;
   if (text.includes('cardio') || text.includes('heart')) return <HeartIcon3D size={size} />;
   if (text.includes('neuro') || text.includes('brain')) return <BrainIcon3D size={size} />;
-  if (text.includes('derma') || text.includes('skin') || text.includes('sparkle')) return <SparklesIcon3D size={size} />;
-  if (text.includes('pediatric') || text.includes('child') || text.includes('baby')) return <BabyIcon3D size={size} />;
-  if (text.includes('gynec') || text.includes('women') || text.includes('female')) return <FemaleIcon3D size={size} />;
-  if (text.includes('dent') || text.includes('tooth') || text.includes('oral') || text.includes('smile')) return <ToothIcon3D size={size} />;
-  if (text.includes('ortho') || text.includes('joint') || text.includes('physio') || text.includes('bone')) return <ActivityIcon3D size={size} />;
-  if (text.includes('diag') || text.includes('lab') || text.includes('patholog')) return <ActivityIcon3D size={size} />;
-  if (text.includes('tele') || text.includes('video')) return <Video3DIcon size={size} />;
-  if (text.includes('vaccin') || text.includes('immun') || text.includes('shield') || text.includes('prevent')) return <Shield3DIcon size={size} />;
-  if (text.includes('emergency') || text.includes('urgent') || text.includes('clock')) return <Clock3DIcon size={size} />;
-  if (text.includes('hospital') || text.includes('clinic')) return <Hospital3DIcon size={size} />;
+  if (text.includes('ortho') || text.includes('joint') || text.includes('bone')) return <ActivityIcon3D size={size} />;
   
-  return <StethoscopeIcon3D size={size} />;
+  return <Hospital3DIcon size={size} />;
 }
 
 export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
@@ -65,154 +59,104 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
         if (mounted) {
           setServices([
             {
-              id: 'srv-1',
-              title: 'General Health & Primary Care',
-              name: 'General Health & Primary Care',
-              specialization: 'General Medicine',
-              department: 'General Medicine',
-              category: 'General Care',
-              description: 'Comprehensive physical examination, primary diagnosis, chronic disease management, and prescription guidance.',
-              overview: 'Our General Medicine department serves as the foundation of health management at Medora Hospital, offering expert diagnosis, evidence-based treatments, and individualized lifestyle guidance.',
-              benefits: ['Full body vitals screening & biometric analysis', 'Same-day digital prescription & medical record', 'Complimentary 7-day query support', 'Integrated pharmacy and pathology coordination'],
+              id: 'srv-xray',
+              title: 'Digital X-Ray (High-Resolution Radiography)',
+              name: 'Digital X-Ray (High-Resolution Radiography)',
+              specialization: 'Radiology',
+              department: 'Radiology & Diagnostic Imaging',
+              category: 'Radiology & Imaging',
+              description: 'Advanced low-dose digital radiography for chest, bones, joints, spine, and abdominal diagnostics with instant high-clarity radiologist interpretation.',
+              overview: 'Medora Hospital’s Radiology Department is equipped with low-dose digital radiography systems offering rapid, high-precision skeletal and pulmonary diagnosis.',
+              benefits: [
+                'Ultra-low radiation dosage exposure',
+                'Immediate digital film preview & instant radiologist analysis',
+                'Direct integration with patient portal for quick retrieval',
+                'Available 24/7 for acute trauma and routine checks'
+              ],
               startingPrice: 600,
               sessionPrice: 600,
-              features: ['Complete clinical physical assessment', 'Digital prescription & summary', 'Follow-up query support'],
-              icon: 'stethoscope',
+              features: ['Immediate digital imaging', 'Certified radiologist report', 'Low radiation technology', 'Available 24x7'],
+              icon: 'xray',
             },
             {
-              id: 'srv-2',
-              title: 'Cardiology & Advanced Heart Care',
-              name: 'Cardiology & Advanced Heart Care',
-              specialization: 'Cardiology',
-              department: 'Cardiology',
-              category: 'Specialized Care',
-              description: 'Advanced non-invasive cardiac evaluation, digital 12-lead ECG review, 2D Echo triage, blood pressure optimization, and lipid management.',
-              overview: 'Dedicated to cardiac excellence, Medora Hospital cardiologists utilize state-of-the-art diagnostic protocols to detect, manage, and prevent cardiovascular conditions.',
-              benefits: ['12-lead digital ECG and rhythm analysis', 'Cardiovascular risk stratification', 'Hypertension & lipid management protocols', 'Direct admission pathway for emergency care'],
+              id: 'srv-ct',
+              title: 'CT Scan (Computed Tomography 128-Slice)',
+              name: 'CT Scan (Computed Tomography 128-Slice)',
+              specialization: 'Radiology',
+              department: 'Radiology & Diagnostic Imaging',
+              category: 'Radiology & Imaging',
+              description: 'Ultra-fast sub-second multi-slice CT scanning for brain, chest, abdomen, pelvis, and angiography with 3D multi-planar reconstruction.',
+              overview: 'Our 128-slice CT scanner delivers volumetric cross-sectional imaging for prompt emergency evaluation of stroke, trauma, chest anomalies, and internal pathologies.',
+              benefits: [
+                'High-speed scanning in seconds with minimum breath-hold',
+                'Sub-millimeter slice resolution with 3D vascular reconstruction',
+                'Non-ionic safe contrast administration with kidney protection check',
+                'Certified senior radiologist emergency review'
+              ],
+              startingPrice: 2500,
+              sessionPrice: 2500,
+              features: ['128-Slice rapid scan', '3D Multi-planar reconstruction', 'Emergency stroke triage', 'High diagnostic accuracy'],
+              icon: 'ctscan',
+            },
+            {
+              id: 'srv-mri',
+              title: 'MRI Scan (Magnetic Resonance 1.5 Tesla)',
+              name: 'MRI Scan (Magnetic Resonance 1.5 Tesla)',
+              specialization: 'Radiology',
+              department: 'Radiology & Diagnostic Imaging',
+              category: 'Radiology & Imaging',
+              description: 'High-field 1.5 Tesla silent MRI scanning for brain, neuro-spine, joints, musculoskeletal conditions, and soft tissue diagnostics without radiation.',
+              overview: 'Experience silent, comfortable, radiation-free neuro and musculoskeletal imaging with Medora Hospital’s high-field Magnetic Resonance system.',
+              benefits: [
+                'Zero ionizing radiation exposure',
+                'Superior soft-tissue contrast for brain, spine, ligaments, and joints',
+                'Acoustic noise reduction technology for enhanced patient comfort',
+                'Comprehensive sub-specialty neuro & musculoskeletal reporting'
+              ],
+              startingPrice: 4000,
+              sessionPrice: 4000,
+              features: ['Silent scan technology', 'Zero radiation exposure', 'High-definition soft tissue', 'Expert neuro-radiology review'],
+              icon: 'mriscan',
+            },
+            {
+              id: 'srv-usg',
+              title: 'Ultrasound Sonography (USG & 4D Color Doppler)',
+              name: 'Ultrasound Sonography (USG & 4D Color Doppler)',
+              specialization: 'Radiology',
+              department: 'Radiology & Diagnostic Imaging',
+              category: 'Radiology & Imaging',
+              description: 'Safe acoustic sound wave imaging for whole abdomen, pelvis, KUB, thyroid, musculoskeletal, and vascular color Doppler assessments.',
+              overview: 'Our advanced ultrasound suite delivers high-frequency real-time imaging for abdominal organs, maternal wellness, thyroid profiling, and vascular blood flow.',
+              benefits: [
+                'Completely safe, non-invasive acoustic sound wave diagnostic',
+                'High-resolution color Doppler for arterial & venous blood flow',
+                'Immediate bedside printout and digital video recording',
+                'Comfortable examination conducted by experienced sonologists'
+              ],
               startingPrice: 1200,
               sessionPrice: 1200,
-              features: ['12-lead digital ECG review', 'Cardiovascular risk stratification', 'Lifestyle & dietary planning'],
-              icon: 'heart',
+              features: ['Color Doppler imaging', 'Non-invasive & radiation free', 'Immediate digital report', 'Conducted by certified MD sonologist'],
+              icon: 'sonography',
             },
             {
-              id: 'srv-3',
-              title: 'Dermatology & Skin Aesthetics',
-              name: 'Dermatology & Skin Aesthetics',
-              specialization: 'Dermatology',
-              department: 'Dermatology',
-              category: 'Specialized Care',
-              description: 'Specialized clinical dermatology for acne, eczema, psoriasis, hair loss, laser consultations, and advanced allergy diagnostics.',
-              overview: 'Combining medical dermatology and aesthetic care, our dermatologists treat skin, hair, and nail conditions using certified protocols and clinical technologies.',
-              benefits: ['High-resolution dermoscopy and skin barrier analysis', 'Individualized acne, eczema, and psoriasis roadmaps', 'Clinical trichology assessments for hair health', 'Safe, medical-grade laser and aesthetic consultations'],
-              startingPrice: 900,
-              sessionPrice: 900,
-              features: ['Skin barrier analysis', 'Acne treatment plans', 'Hair follicle health audit'],
-              icon: 'sparkles',
-            },
-            {
-              id: 'srv-4',
-              title: 'Neurology & Brain Sciences',
-              name: 'Neurology & Brain Sciences',
-              specialization: 'Neurology',
-              department: 'Neurology',
-              category: 'Specialized Care',
-              description: 'Expert neurological evaluations for migraines, chronic headaches, neuropathy, vertigo, seizure disorders, and cognitive wellness.',
-              overview: 'Our neurology specialists deliver advanced diagnostics and therapeutic management for complex central and peripheral nervous system disorders.',
-              benefits: ['Specialized chronic migraine and headache profiling', 'Comprehensive nerve conduction and reflex testing', 'Sleep disorder and cognitive wellness reviews', 'Targeted neuro-rehabilitation care plans'],
-              startingPrice: 1500,
-              sessionPrice: 1500,
-              features: ['Reflex & motor function test', 'Migraine trigger mapping', 'Cognitive wellness assessment'],
-              icon: 'brain',
-            },
-            {
-              id: 'srv-5',
-              title: 'Orthopedics & Joint Care',
-              name: 'Orthopedics & Joint Care',
-              specialization: 'Orthopedics',
-              department: 'Orthopedics',
-              category: 'Specialized Care',
-              description: 'Bone density evaluation, joint pain management, sports injury rehabilitation, arthritis triage, and minimally invasive surgical consultations.',
-              overview: 'From sports injuries to degenerative arthritis, Medora’s orthopedic team delivers precision diagnostic care, joint preservation strategies, and physical rehabilitation.',
-              benefits: ['Detailed joint mobility and range-of-motion assessments', 'Digital X-ray, CT, and MRI evaluations', 'Personalized physical rehabilitation roadmaps', 'Ergonomic guidance for musculoskeletal health'],
-              startingPrice: 1100,
-              sessionPrice: 1100,
-              features: ['Range-of-motion audit', 'X-ray / MRI review', 'Physical rehab roadmap'],
-              icon: 'activity',
-            },
-            {
-              id: 'srv-6',
-              title: 'Pediatrics & Child Healthcare',
-              name: 'Pediatrics & Child Healthcare',
-              specialization: 'Pediatrics',
-              department: 'Pediatrics',
-              category: 'Specialized Care',
-              description: 'Child wellness assessments, infant growth milestones, pediatric nutrition, and complete WHO/IAP vaccination schedules.',
-              overview: 'Providing compassionate care from birth through adolescence, our pediatric team ensures your child’s optimal physical, cognitive, and emotional development.',
-              benefits: ['Growth percentile and developmental tracking', 'Cold-chain certified WHO and IAP vaccination schedules', 'Pediatric allergy and nutrition guidance', 'Direct access to pediatric emergency care'],
+              id: 'srv-blood',
+              title: 'Comprehensive Blood Tests & Pathology Panel',
+              name: 'Comprehensive Blood Tests & Pathology Panel',
+              specialization: 'Pathology',
+              department: 'Pathology & Diagnostic Laboratory',
+              category: 'Pathology & Lab Tests',
+              description: 'NABL-accredited automated pathology tests including Complete Blood Count (CBC), Lipid Profile, Liver (LFT), Kidney (KFT), Thyroid (T3/T4/TSH), and HbA1c.',
+              overview: 'Medora Hospital’s fully automated pathology laboratory processes blood samples using barcode verification to ensure verified results delivered within 12 hours.',
+              benefits: [
+                'NABL accredited automated robotic sample analyzers',
+                'Complete metabolic health audit (CBC, LFT, KFT, Lipids, Blood Sugar)',
+                'Digital pathology report delivered to patient portal in 12 hours',
+                'Complimentary consulting doctor interpretation support'
+              ],
               startingPrice: 800,
               sessionPrice: 800,
-              features: ['Growth percentile chart', 'Vaccination certificate', 'Diet & lactation counselling'],
-              icon: 'baby',
-            },
-            {
-              id: 'srv-7',
-              title: 'Gynecology & Women’s Health',
-              name: 'Gynecology & Women’s Health',
-              specialization: 'Gynecology',
-              department: 'Gynecology',
-              category: 'Specialized Care',
-              description: 'Antenatal care, PCOS/PCOD management, hormonal health, cervical screenings, and personalized family planning guidance.',
-              overview: 'Dedicated to women across all life stages, our gynecology department provides empathetic care covering preventive screening, hormonal balance, and maternal care.',
-              benefits: ['High-resolution pelvic ultrasound and pap smear reviews', 'Structured PCOS/PCOD metabolic lifestyle programs', 'Comprehensive prenatal and antenatal health roadmaps', 'Confidential and compassionate clinical environment'],
-              startingPrice: 1000,
-              sessionPrice: 1000,
-              features: ['Pelvic ultrasound review', 'Hormonal balance panel', 'Confidential consultation'],
-              icon: 'female',
-            },
-            {
-              id: 'srv-8',
-              title: 'Dental Care & Oral Surgery',
-              name: 'Dental Care & Oral Surgery',
-              specialization: 'Dentistry',
-              department: 'Dental Care',
-              category: 'Specialized Care',
-              description: 'Digital smile design, painless root canals, teeth alignment, dental scaling, cavity prevention, and surgical extractions.',
-              overview: 'Our dental suite at Medora Hospital offers restorative, preventative, and cosmetic oral healthcare delivered with advanced sterile instrumentation.',
-              benefits: ['High-definition intraoral camera diagnostics', 'Painless single-sitting root canal treatment options', 'Ultrasonic dental scaling and enamel protection', 'Transparent pricing with take-home oral care kits'],
-              startingPrice: 700,
-              sessionPrice: 700,
-              features: ['Intraoral camera examination', 'Digital dental mapping', 'Enamel polish & cleaning'],
-              icon: 'tooth',
-            },
-            {
-              id: 'srv-9',
-              title: 'Diagnostics & Laboratory Services',
-              name: 'Diagnostics & Laboratory Services',
-              specialization: 'Diagnostics and Laboratory',
-              department: 'Diagnostics',
-              category: 'Diagnostics',
-              description: 'NABL-accredited diagnostic tests including complete metabolic panels, thyroid profiles, lipid panels, urine cytology, and digital radiology.',
-              overview: 'Equipped with cutting-edge automated analyzers, Medora Hospital’s pathology and diagnostic laboratory delivers precise results within hours.',
-              benefits: ['Automated barcoded specimen processing', 'Verified digital reports delivered via patient portal within 12-24 hours', 'Doctor review included with abnormal laboratory values', 'Strict international quality assurance standards'],
-              startingPrice: 500,
-              sessionPrice: 500,
-              features: ['Home sample collection available', 'Digital report delivery within 24 hours', 'Doctor review included'],
-              icon: 'activity',
-            },
-            {
-              id: 'srv-10',
-              title: 'HD Telemedicine Video Consultation',
-              name: 'HD Telemedicine Video Consultation',
-              specialization: 'General Medicine',
-              department: 'Telemedicine',
-              category: 'Telemedicine',
-              description: 'End-to-end encrypted video consultation with senior board-certified specialists from anywhere in India.',
-              overview: 'Experience high-definition video healthcare consultations from the comfort of your home with certified Medora Hospital specialists.',
-              benefits: ['Zero waiting room time', 'Encrypted audio/video room', 'E-prescription delivered instantly to patient portal', 'Follow-up consultation booking discount'],
-              startingPrice: 900,
-              sessionPrice: 900,
-              features: ['Zero waiting room time', 'Encrypted audio/video room', 'E-prescription delivered instantly'],
-              icon: 'video',
+              features: ['Automated barcode processing', 'Report ready in 12 hours', 'Home collection available', 'Consulting physician review'],
+              icon: 'bloodtest',
             },
           ]);
         }
@@ -224,7 +168,7 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
     return () => { mounted = false; };
   }, []);
 
-  const categories = ['ALL', 'General Care', 'Specialized Care', 'Diagnostics', 'Preventive', 'Telemedicine'];
+  const categories = ['ALL', 'Radiology & Imaging', 'Pathology & Lab Tests'];
 
   const filteredServices = services.filter((srv) => {
     const title = srv.title || srv.name || '';
@@ -232,7 +176,8 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
     const dept = srv.department || srv.specialization || '';
     const matchesCat = selectedCategory === 'ALL' ||
       srv.category === selectedCategory ||
-      (selectedCategory === 'Specialized Care' && ['Cardiology', 'Dermatology', 'Neurology', 'Orthopedics', 'Pediatrics', 'Gynecology', 'Dentistry'].includes(srv.specialization));
+      (selectedCategory === 'Radiology & Imaging' && (dept.includes('Radiology') || srv.specialization === 'Radiology')) ||
+      (selectedCategory === 'Pathology & Lab Tests' && (dept.includes('Pathology') || srv.specialization === 'Pathology'));
     
     const matchesQuery = !searchQuery ||
       title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -265,14 +210,13 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
           marginBottom: 14,
           border: '1px solid #CCFBF1',
         }}>
-          <span>✦ Clinical Excellence & Specialized Healthcare</span>
+          <span>✦ Medora Diagnostic & Radiology Suites</span>
         </div>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.5px', marginBottom: 12 }}>
-          Medora Hospital Clinical Services
+          Hospital Diagnostic & Imaging Services
         </h1>
         <p style={{ fontSize: '1.05rem', color: '#64748B', maxWidth: 680, margin: '0 auto' }}>
-          Explore our range of hospital care, diagnostics, preventive programs, and video consultations.
-          Every service is backed by board-certified specialists and transparent session-based pricing in Indian Rupees (₹).
+          Schedule high-precision Digital X-Ray, 128-Slice CT Scan, 1.5 Tesla MRI, 4D Ultrasound Sonography, and Comprehensive Diagnostic Blood Tests with immediate digital reporting in Indian Rupees (₹).
         </p>
       </div>
 
@@ -300,7 +244,7 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
           <SearchIcon size={18} style={{ position: 'absolute', left: 14, color: '#94A3B8' }} />
           <input
             type="text"
-            placeholder="Search clinical services, departments, treatments..."
+            placeholder="Search diagnostic services (X-Ray, CT Scan, MRI, Sonography, Blood Tests)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -347,15 +291,15 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
       {/* Services Grid */}
       {loading ? (
         <div style={{ padding: '80px', textAlign: 'center', color: '#64748B' }}>
-          Loading clinical services catalog...
+          Loading diagnostic services...
         </div>
       ) : filteredServices.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '60px 24px' }}>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0F172A', marginBottom: 8 }}>
-            No matching services found
+            No matching diagnostic services found
           </h3>
           <p style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: 16 }}>
-            Try searching for another treatment or clear your category filter.
+            Try searching for X-Ray, CT Scan, MRI, Sonography, or Blood Tests.
           </p>
           <button
             onClick={() => { setSearchQuery(''); setSelectedCategory('ALL'); }}
@@ -371,9 +315,9 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
           gap: 28,
         }}>
           {filteredServices.map((srv) => {
-            const title = srv.title || srv.name || 'Medical Service';
-            const price = srv.startingPrice || srv.sessionPrice || srv.price || 800;
-            const dept = srv.department || srv.specialization || 'Clinical Care';
+            const title = srv.title || srv.name || 'Diagnostic Service';
+            const price = srv.startingPrice || srv.sessionPrice || srv.price || 600;
+            const dept = srv.department || 'Radiology & Diagnostic Imaging';
 
             return (
               <div
@@ -395,7 +339,7 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
                   {/* Header with 3D Icon & Category Badge */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                     <div style={{ cursor: 'pointer' }} onClick={() => setSelectedServiceForDetail(srv)}>
-                      {getService3DIcon(srv, 52)}
+                      {getService3DIcon(srv, 56)}
                     </div>
                     <span style={{
                       fontSize: '0.74rem',
@@ -444,10 +388,9 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
                   gap: 12,
                 }}>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: '#94A3B8', fontWeight: 600 }}>SESSION FEE</div>
+                    <div style={{ fontSize: '0.72rem', color: '#94A3B8', fontWeight: 600 }}>FEE / TEST</div>
                     <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0D9488' }}>
                       ₹{price}
-                      <span style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 500 }}> / session</span>
                     </div>
                   </div>
 
@@ -464,7 +407,7 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
                       className="btn btn-primary btn-sm"
                       style={{ padding: '8px 16px', fontSize: '0.84rem' }}
                     >
-                      <span>Book</span>
+                      <span>Book Service</span>
                       <ArrowRightIcon size={14} />
                     </button>
                   </div>
@@ -531,7 +474,7 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
 
             {/* Modal Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24 }}>
-              {getService3DIcon(selectedServiceForDetail, 64)}
+              {getService3DIcon(selectedServiceForDetail, 68)}
               <div>
                 <div style={{
                   display: 'inline-block',
@@ -544,7 +487,7 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
                   border: '1px solid #CCFBF1',
                   marginBottom: 6,
                 }}>
-                  {selectedServiceForDetail.department || selectedServiceForDetail.specialization || 'Medora Specialty'}
+                  {selectedServiceForDetail.department || 'Hospital Diagnostic Facility'}
                 </div>
                 <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.25 }}>
                   {selectedServiceForDetail.title || selectedServiceForDetail.name}
@@ -555,7 +498,7 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
             {/* Clinical Overview */}
             <div style={{ marginBottom: 24 }}>
               <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0F172A', marginBottom: 8 }}>
-                Clinical Service Overview
+                Clinical Diagnostic Scope & Technology
               </h4>
               <p style={{ fontSize: '0.94rem', color: '#475569', lineHeight: 1.6 }}>
                 {selectedServiceForDetail.overview || selectedServiceForDetail.description}
@@ -566,7 +509,7 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
             {selectedServiceForDetail.benefits && selectedServiceForDetail.benefits.length > 0 && (
               <div style={{ marginBottom: 24, backgroundColor: '#F8FAFC', padding: 20, borderRadius: 16 }}>
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0F172A', marginBottom: 12 }}>
-                  Key Clinical Benefits & Inclusions
+                  Key Diagnostic Inclusions & Patient Safeguards
                 </h4>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
                   {selectedServiceForDetail.benefits.map((b, idx) => (
@@ -579,7 +522,7 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
               </div>
             )}
 
-            {/* Pricing & Consultation Info */}
+            {/* Pricing & Facility Info */}
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -594,40 +537,35 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
             }}>
               <div>
                 <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0F766E' }}>
-                  TRANSPARENT SESSION RATE
+                  HOSPITAL SERVICE FEE
                 </div>
                 <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0D9488' }}>
-                  ₹{selectedServiceForDetail.startingPrice || selectedServiceForDetail.sessionPrice || selectedServiceForDetail.price || 800}
-                  <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#475569' }}> / clinical session</span>
+                  ₹{selectedServiceForDetail.startingPrice || selectedServiceForDetail.sessionPrice || selectedServiceForDetail.price || 600}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#0F766E', marginTop: 2 }}>
-                  ✦ Follow-up consultation discounts automatically applied
+                  ✦ Includes digital film preview and certified radiologist/pathologist report
                 </div>
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '0.8rem', color: '#64748B' }}>Hospital Facility</div>
+                <div style={{ fontSize: '0.8rem', color: '#64748B' }}>Diagnostic Center</div>
                 <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0F172A' }}>
                   Medora Hospital, Saket Campus
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#0D9488', fontWeight: 600 }}>
-                  In-Person OPD & Encrypted Video
+                  Wing B, Radiology & Pathology Block
                 </div>
               </div>
             </div>
 
-            {/* Action Buttons: Book This Service & Browse Doctors */}
+            {/* Action Buttons */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'flex-end' }}>
               <button
-                onClick={() => {
-                  const spec = selectedServiceForDetail.specialization || selectedServiceForDetail.department;
-                  setSelectedServiceForDetail(null);
-                  if (onFindDoctor) onFindDoctor(spec);
-                }}
+                onClick={() => setSelectedServiceForDetail(null)}
                 className="btn btn-outline"
                 style={{ padding: '12px 20px', borderRadius: 12, fontWeight: 700 }}
               >
-                Browse Department Doctors
+                Close
               </button>
               
               <button
@@ -671,14 +609,14 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
       }}>
         <div style={{ maxWidth: 640 }}>
           <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: 8 }}>
-            Need guidance choosing the right clinical specialty?
+            Have a prescription from your doctor?
           </h3>
           <p style={{ fontSize: '0.92rem', color: '#99F6E4', lineHeight: 1.5 }}>
-            Our healthcare triage team can assist you in finding the exact doctor or diagnostic test suited to your symptoms.
+            Book your X-Ray, CT Scan, MRI Scan, Ultrasound, or Blood Test slot online with priority access and zero waiting line.
           </p>
         </div>
         <button
-          onClick={() => onFindDoctor && onFindDoctor()}
+          onClick={() => handleOpenBooking(null)}
           className="btn"
           style={{
             backgroundColor: '#2DD4BF',
@@ -688,7 +626,7 @@ export default function ServicesPage({ onBookAppointment, onFindDoctor }) {
             borderRadius: 12,
           }}
         >
-          Browse All Medora Doctors
+          Book An Appointment Now
         </button>
       </div>
     </div>

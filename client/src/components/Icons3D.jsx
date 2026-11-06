@@ -345,3 +345,127 @@ export const SPECIALTY_3D_MAP = {
   'general-medicine': StethoscopeIcon3D,
   orthopedics: ActivityIcon3D,
 };
+
+// ==========================================
+// 3D HOSPITAL DIAGNOSTIC & IMAGING SERVICES
+// ==========================================
+
+export function XRayIcon3D({ size = 56 }) {
+  return (
+    <div style={{
+      width: size,
+      height: size,
+      borderRadius: '24%',
+      background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0369A1 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      boxShadow: '0 10px 22px -5px rgba(2, 132, 199, 0.45), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.5)',
+      position: 'relative',
+    }}>
+      <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 48 48" fill="none">
+        <rect x="6" y="6" width="36" height="36" rx="8" stroke="#38BDF8" strokeWidth="2.5" fill="#0284C7" fillOpacity="0.2" />
+        <line x1="24" y1="12" x2="24" y2="36" stroke="#E0F2FE" strokeWidth="3" strokeLinecap="round" />
+        <path d="M16 18c4 2 12 2 16 0" stroke="#BAE6FD" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M14 24c5 3 15 3 20 0" stroke="#BAE6FD" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M16 30c4 2 12 2 16 0" stroke="#BAE6FD" strokeWidth="2.5" strokeLinecap="round" />
+        <circle cx="24" cy="24" r="6" fill="#38BDF8" opacity="0.3" />
+      </svg>
+    </div>
+  );
+}
+
+export function CtScanIcon3D({ size = 56 }) {
+  return (
+    <div style={{
+      width: size,
+      height: size,
+      borderRadius: '24%',
+      background: 'linear-gradient(135deg, #E0F2FE 0%, #7DD3FC 50%, #0284C7 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      boxShadow: '0 10px 22px -5px rgba(2, 132, 199, 0.4), inset 0 2px 4px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(3, 105, 161, 0.3)',
+      position: 'relative',
+    }}>
+      <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="16" stroke="#0369A1" strokeWidth="4.5" />
+        <circle cx="24" cy="24" r="9" fill="#0C4A6E" />
+        <rect x="15" y="22" width="18" height="4" rx="2" fill="#38BDF8" />
+        <line x1="8" y1="24" x2="40" y2="24" stroke="#F43F5E" strokeWidth="1.8" strokeDasharray="2 2" />
+      </svg>
+    </div>
+  );
+}
+
+export function MriScanIcon3D({ size = 56 }) {
+  return (
+    <div style={{
+      width: size,
+      height: size,
+      borderRadius: '24%',
+      background: 'linear-gradient(135deg, #EDE9FE 0%, #C4B5FD 50%, #7C3AED 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      boxShadow: '0 10px 22px -5px rgba(124, 58, 237, 0.4), inset 0 2px 4px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(91, 33, 182, 0.3)',
+      position: 'relative',
+    }}>
+      <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 48 48" fill="none">
+        <ellipse cx="24" cy="24" rx="16" ry="17" stroke="#6D28D9" strokeWidth="4" />
+        <circle cx="24" cy="24" r="8" fill="#4C1D95" />
+        <path d="M12 24h24" stroke="#A78BFA" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M24 14v20" stroke="#DDD6FE" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="24" cy="24" r="3" fill="#FFFFFF" />
+      </svg>
+    </div>
+  );
+}
+
+export function SonographyIcon3D({ size = 56 }) {
+  return (
+    <div style={{
+      width: size,
+      height: size,
+      borderRadius: '24%',
+      background: 'linear-gradient(135deg, #CCFBF1 0%, #5EEAD4 50%, #0D9488 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      boxShadow: '0 10px 22px -5px rgba(13, 148, 136, 0.4), inset 0 2px 4px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(15, 118, 110, 0.3)',
+      position: 'relative',
+    }}>
+      <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 48 48" fill="none">
+        <rect x="18" y="8" width="12" height="12" rx="3" fill="#134E4A" />
+        <path d="M16 20h16l-3 4H19l-3-4z" fill="#042F2E" />
+        <path d="M16 28c4 3 12 3 16 0" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
+        <path d="M12 34c7 4 17 4 24 0" stroke="#CCFBF1" strokeWidth="2.8" strokeLinecap="round" />
+        <path d="M8 40c10 5 22 5 32 0" stroke="#99F6E4" strokeWidth="2.5" strokeLinecap="round" />
+      </svg>
+    </div>
+  );
+}
+
+export function BloodTestIcon3D({ size = 56 }) {
+  return (
+    <div style={{
+      width: size,
+      height: size,
+      borderRadius: '24%',
+      background: 'linear-gradient(135deg, #FFE4E6 0%, #FDA4AF 50%, #E11D48 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      boxShadow: '0 10px 22px -5px rgba(225, 29, 72, 0.4), inset 0 2px 4px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(159, 18, 57, 0.3)',
+      position: 'relative',
+    }}>
+      <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 48 48" fill="none">
+        <rect x="19" y="8" width="10" height="26" rx="5" stroke="#FFFFFF" strokeWidth="2.5" fill="#FFE4E6" fillOpacity="0.4" />
+        <rect x="17" y="6" width="14" height="4" rx="2" fill="#BE123C" />
+        <path d="M20 22h8v7a4 4 0 0 1-8 0v-7z" fill="#BE123C" />
+        <path d="M36 28c0 3.5-3 6.5-6 6.5s-6-3-6-6.5c0-3 6-9.5 6-9.5s6 6.5 6 9.5z" fill="#9F1239" />
+        <circle cx="28" cy="28" r="1.5" fill="#FFFFFF" opacity="0.8" />
+      </svg>
+    </div>
+  );
+}

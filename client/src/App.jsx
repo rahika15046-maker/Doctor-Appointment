@@ -43,6 +43,7 @@ export default function App() {
   const [bookedDoctorData, setBookedDoctorData] = useState(null);
   const [preselectedDoctorForBooking, setPreselectedDoctorForBooking] = useState(null);
   const [preselectedServiceForBooking, setPreselectedServiceForBooking] = useState(null);
+  const [pendingBookingAction, setPendingBookingAction] = useState(null);
   const [notificationsModalOpen, setNotificationsModalOpen] = useState(false);
 
   // Filter params for FindDoctors
@@ -99,8 +100,10 @@ export default function App() {
     setDoctorProfileOpen(true);
   };
 
+  // Central booking initiator: First check login -> if not, login/signup then continue
   const handleStartBooking = (doctor = null, service = null) => {
     if (!user) {
+      setPendingBookingAction({ doctor, service });
       setAuthModalMode('login');
       setAuthModalOpen(true);
       return;
@@ -240,10 +243,7 @@ export default function App() {
 
             <ServicesSection
               onSelectService={(srv) => {
-                if (srv && srv.name) {
-                  setFindDoctorSpec(srv.department || 'All');
-                }
-                setCurrentView('services');
+                handleStartBooking(null, srv);
               }}
               onViewAll={() => setCurrentView('services')}
             />
@@ -285,14 +285,25 @@ export default function App() {
         <Footer onNavigate={(view) => setCurrentView(view)} />
       )}
 
-      {/* Authentication Modal */}
+      {/* Authentication Modal with Pending Booking Action Resume */}
       <AuthModal
         initialMode={authModalMode}
         isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
+        onClose={() => {
+          setAuthModalOpen(false);
+          setPendingBookingAction(null);
+        }}
         onAuthSuccess={(authUser) => {
           setUser(authUser);
-          setCurrentView('dashboard');
+          setAuthModalOpen(false);
+          if (pendingBookingAction) {
+            setPreselectedDoctorForBooking(pendingBookingAction.doctor);
+            setPreselectedServiceForBooking(pendingBookingAction.service);
+            setCurrentView('booking');
+            setPendingBookingAction(null);
+          } else {
+            setCurrentView('dashboard');
+          }
         }}
       />
 
@@ -301,7 +312,7 @@ export default function App() {
         doctor={selectedDoctorForProfile}
         isOpen={doctorProfileOpen}
         onClose={() => setDoctorProfileOpen(false)}
-        onBookAppointment={(srv) => handleStartBooking(null, srv)}
+        onBookAppointment={(doc) => handleStartBooking(doc, null)}
       />
 
       {/* Booking Success Modal */}
@@ -328,5 +339,3 @@ export default function App() {
     </div>
   );
 }
-
-
