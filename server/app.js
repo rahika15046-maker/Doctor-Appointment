@@ -30,6 +30,7 @@ app.use(
         allowedOrigins.includes(normalized) ||
         normalized.includes('vercel.app') ||
         normalized.includes('onrender.com') ||
+        normalized.includes('netlify.app') ||
         normalized.includes('localhost') ||
         process.env.NODE_ENV !== 'production'
       ) {
@@ -62,13 +63,15 @@ app.use(
   })
 );
 
-// Health check endpoint
-app.get('/health', (_q, res) => res.json({
+// Health check endpoints — both /health and /api/health for Render compatibility
+const healthPayload = (_q, res) => res.json({
   ok: true,
   app: 'MEDORA Hospital API',
   status: 'ONLINE',
-  timestamp: new Date().toISOString()
-}));
+  timestamp: new Date().toISOString(),
+});
+app.get('/health', healthPayload);
+app.get('/api/health', healthPayload);
 
 // API Routes
 app.use('/api', routes);
