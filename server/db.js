@@ -255,7 +255,13 @@ export const memoryStore = {
 };
 
 export async function connectDb() {
-  const uri = process.env.MONGODB_URI;
+  if (process.env.NODE_ENV === 'test') {
+    isMemoryMode = true;
+    await seedDemoData();
+    return;
+  }
+  const defaultAtlasUri = 'mongodb+srv://Radhika:Radhika652@cluster0.jflgsfy.mongodb.net/medora?appName=Cluster0';
+  const uri = process.env.MONGODB_URI || defaultAtlasUri;
   if (!uri) {
     console.log('[DB] No MONGODB_URI set. Initializing resilient in-memory Medora data engine...');
     isMemoryMode = true;

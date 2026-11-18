@@ -35,7 +35,27 @@ async function runTxn(fn) {
 
 // Atomic claim: matches only if still AVAILABLE.
 const claimSlot = async (slotId, doctorId, session) => {
-  const filter = { _id: slotId, doctorId, status: 'AVAILABLE' };
+  let existing = await AppointmentSlot.findOne({ _id: slotId, doctorId });
+  if (!existing && String(slotId).includes('-')) {
+    const parts = String(slotId).split('-');
+    const h = parseInt(parts[parts.length - 1], 10);
+    const dateStr = parts.slice(parts.length - 4, parts.length - 1).join('-');
+    if (!isNaN(h) && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      const s = new Date(`${dateStr}T${String(h).padStart(2, '0')}:00:00+05:30`);
+      const e = new Date(s.getTime() + 45 * 60e3);
+      try {
+        existing = await AppointmentSlot.create({
+          doctorId,
+          startAt: s,
+          endAt: e,
+          status: 'AVAILABLE',
+          isBlocked: false,
+        });
+        slotId = existing._id;
+      } catch (_e) {}
+    }
+  }
+  const filter = { _id: existing?._id || slotId, doctorId, status: 'AVAILABLE' };
   const update = { status: 'BOOKED' };
   const opts = { new: true };
   if (session) opts.session = session;

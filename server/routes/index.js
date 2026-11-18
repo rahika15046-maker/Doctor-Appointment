@@ -64,12 +64,14 @@ const uploadReport = multer({
 
 const setCookie = (res, u) => {
   const token = jwt.sign({ sub: u.id || u._id }, JWT_SECRET, { expiresIn: '7d' });
+  const isProd = process.env.NODE_ENV === 'production';
   res.cookie('token', token, {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: isProd ? 'none' : 'lax',
+    secure: isProd,
     maxAge: 7 * 864e5,
   });
+  return token;
 };
 
 const pub = (u) => ({
@@ -118,8 +120,8 @@ r.post('/auth/register', wrap(async (req, res) => {
     isActive: true,
     profileCompletion: 75,
   });
-  setCookie(res, u);
-  res.status(201).json({ success: true, data: pub(u), message: 'Account created successfully!' });
+  const token = setCookie(res, u);
+  res.status(201).json({ success: true, data: pub(u), token, message: 'Account created successfully!' });
 }));
 
 r.post('/auth/login', wrap(async (req, res) => {
@@ -134,8 +136,8 @@ r.post('/auth/login', wrap(async (req, res) => {
   const valid = await bcrypt.compare(password || '', u.password);
   if (!valid) throw new ApiError(401, 'Invalid email or password');
   
-  setCookie(res, u);
-  res.json({ success: true, data: pub(u), message: 'Welcome back, ' + u.name + '!' });
+  const token = setCookie(res, u);
+  res.json({ success: true, data: pub(u), token, message: 'Welcome back, ' + u.name + '!' });
 }));
 
 // Google OAuth Login
@@ -159,8 +161,8 @@ r.post('/auth/google', wrap(async (req, res) => {
       address: 'Saket Health District, New Delhi',
     });
   }
-  setCookie(res, u);
-  res.json({ success: true, data: pub(u), message: 'Signed in with Google successfully' });
+  const token = setCookie(res, u);
+  res.json({ success: true, data: pub(u), token, message: 'Signed in with Google successfully' });
 }));
 
 r.post('/auth/logout', (_q, res) => {
@@ -331,11 +333,33 @@ r.get('/doctors/:id/availability', wrap(async (req, res) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new ApiError(400, 'date=YYYY-MM-DD required');
   const from = new Date(`${day}T00:00:00+05:30`);
   const to = new Date(from.getTime() + 864e5);
-  const slots = await AppointmentSlot.find({
+  let slots = await AppointmentSlot.find({
     doctorId: req.params.id,
     startAt: { $gte: from, $lt: to }
   }).sort('startAt').select('startAt endAt status');
   
+  // If no slots exist for this date, dynamically generate the day's consultation slots
+  if (!slots || slots.length === 0) {
+    const hours = [9, 10, 11, 12, 14, 15, 16, 17];
+    for (const h of hours) {
+      const s = new Date(`${day}T${String(h).padStart(2, '0')}:00:00+05:30`);
+      const e = new Date(s.getTime() + 45 * 60e3);
+      try {
+        await AppointmentSlot.create({
+          doctorId: req.params.id,
+          startAt: s,
+          endAt: e,
+          status: 'AVAILABLE',
+          isBlocked: false,
+        });
+      } catch (_e) {}
+    }
+    slots = await AppointmentSlot.find({
+      doctorId: req.params.id,
+      startAt: { $gte: from, $lt: to }
+    }).sort('startAt').select('startAt endAt status');
+  }
+
   res.json({ success: true, data: slots });
 }));
 
@@ -516,26 +540,24 @@ r.get('/dashboard/stats', requireAuth, wrap(async (req, res) => {
     ? upcomingList.sort((a, b) => new Date(a.startAt) - new Date(b.startAt))[0]
     : null;
 
-  const activities = [
-    ...(nextUpcoming ? [{
-      id: 'act-1',
-      title: `Appointment confirmed with ${nextUpcoming.doctorId?.name || 'Doctor'}`,
-      timestamp: '2 hours ago',
+  const activities = [];
+  if (nextUpcoming) {
+    activities.push({
+      id: `act-${nextUpcoming._id || nextUpcoming.id}`,
+      title: `Upcoming appointment with ${nextUpcoming.doctorId?.name || 'Medora Specialist'}`,
+      timestamp: new Date(nextUpcoming.startAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
       type: 'appointment'
-    }] : []),
-    {
-      id: 'act-2',
-      title: 'Medical record uploaded: Complete Blood Count',
-      timestamp: '1 day ago',
+    });
+  }
+  const userRecords = await MedicalRecord.find({ patientId: userId }).sort('-createdAt').limit(2);
+  userRecords.forEach(r => {
+    activities.push({
+      id: `rec-${r._id || r.id}`,
+      title: `Report: ${r.title}`,
+      timestamp: new Date(r.createdAt || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
       type: 'record'
-    },
-    {
-      id: 'act-3',
-      title: 'Profile information updated',
-      timestamp: '3 days ago',
-      type: 'profile'
-    }
-  ];
+    });
+  });
 
   res.json({
     success: true,
