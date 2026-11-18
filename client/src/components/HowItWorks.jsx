@@ -6,7 +6,7 @@ export default function HowItWorks() {
     {
       num: 1,
       title: 'Search Doctor',
-      desc: 'Discover verified specialists by medical field or clinic location.',
+      desc: 'Choose a Medora doctor by department or clinical specialization.',
       icon: SearchIcon,
     },
     {

@@ -54,14 +54,10 @@ export default function OurDoctors({
 
   const departments = [
     'All',
+    'General Medicine',
     'Cardiology',
-    'Dermatology',
-    'Neurology',
     'Orthopedics',
     'Pediatrics',
-    'Gynecology',
-    'Dentistry',
-    'General Medicine',
   ];
 
   return (
