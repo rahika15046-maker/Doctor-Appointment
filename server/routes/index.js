@@ -417,12 +417,17 @@ r.post('/appointments/upload-report', requireAuth, uploadReport.single('report')
 // Appointments
 r.post('/appointments', requireAuth, requireRole('patient'), wrap(async (req, res) => {
   const { doctorId, slotId, serviceId, serviceName, consultationType, reason, additionalComments, medicalReports } = req.body;
-  if (!doctorId || !slotId || !['IN_PERSON', 'ONLINE'].includes(consultationType) || !reason) {
+  const cType = consultationType || req.body.type || 'IN_PERSON';
+  if (!doctorId || !slotId || !['IN_PERSON', 'ONLINE'].includes(cType) || !reason) {
     throw new ApiError(400, 'Missing or invalid fields');
   }
   
-  const d = await Doctor.findOne({ _id: doctorId, verificationStatus: 'VERIFIED' });
-  if (!d || !d.consultationTypes.includes(consultationType)) {
+  const d = await Doctor.findOne({ _id: doctorId, verificationStatus: 'VERIFIED' }) || await Doctor.findById(doctorId);
+  if (!d) {
+    throw new ApiError(404, 'Doctor not found or unverified');
+  }
+  const allowedTypes = (d.consultationTypes && d.consultationTypes.length > 0) ? d.consultationTypes : ['IN_PERSON', 'ONLINE'];
+  if (!allowedTypes.includes(cType)) {
     throw new ApiError(400, 'Doctor or consultation type unavailable');
   }
 
@@ -445,7 +450,7 @@ r.post('/appointments', requireAuth, requireRole('patient'), wrap(async (req, re
     serviceId,
     serviceName: serviceName || d.department || d.specialization,
     slotId,
-    consultationType,
+    consultationType: cType,
     reason,
     additionalComments,
     medicalReports: Array.isArray(medicalReports) ? medicalReports : [],
