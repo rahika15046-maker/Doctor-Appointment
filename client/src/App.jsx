@@ -71,12 +71,18 @@ export default function App() {
         setFeaturedDoctors(list.slice(0, 4));
       })
       .catch(() => {});
-
-    // Check notifications
-    api.getNotifications()
-      .then((res) => setUnreadNotifications(res.unreadCount || 0))
-      .catch(() => setUnreadNotifications(0));
   }, []);
+
+  // Notifications only for authenticated user
+  useEffect(() => {
+    if (user) {
+      api.getNotifications()
+        .then((res) => setUnreadNotifications(res?.unreadCount || 0))
+        .catch(() => setUnreadNotifications(0));
+    } else {
+      setUnreadNotifications(0);
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     try {
