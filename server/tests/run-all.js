@@ -19,7 +19,10 @@ async function runTest(file) {
     console.log(`\n======================================================`);
     console.log(` RUNNING: ${file}`);
     console.log(`======================================================`);
-    const proc = spawn('node', [path.join(__dirname, file)], { stdio: 'inherit' });
+    const proc = spawn('node', [path.join(__dirname, file)], {
+      stdio: 'inherit',
+      env: { ...process.env, NODE_ENV: 'test' },
+    });
     proc.on('close', (code) => {
       resolve({ file, passed: code === 0 });
     });

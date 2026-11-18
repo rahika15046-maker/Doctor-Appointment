@@ -19,7 +19,7 @@ import {
 export default function AboutUsPage({ onFindDoctors, onBookAppointment }) {
   const stats = [
     { value: '50,000+', label: 'Successful Consultations', desc: 'Across outpatient clinics & video consultations' },
-    { value: '25+', label: 'Specialized Departments', desc: 'Cardiology, Neurology, Orthopedics, Pediatrics & more' },
+    { value: '4', label: 'Clinical Departments', desc: 'General Medicine, Cardiology, Orthopedics & Pediatrics' },
     { value: '450+', label: 'Bed Capacity', desc: 'State-of-the-art ICU, surgical suites & emergency care' },
     { value: '98.8%', label: 'Patient Satisfaction', desc: 'Based on genuine post-care patient reviews' },
   ];
@@ -31,8 +31,8 @@ export default function AboutUsPage({ onFindDoctors, onBookAppointment }) {
       icon: <Hospital3DIcon size={56} />,
     },
     {
-      title: 'Atomic Double-Booking Prevention',
-      desc: 'Our proprietary hospital concurrency lock enforces database-level slot reservations. If two patients attempt to book the same slot simultaneously, conflicts are caught cleanly with HTTP 409.',
+      title: 'Guaranteed On-Time Appointments',
+      desc: 'Our real-time scheduling ensures your clinical appointment is confirmed immediately with zero wait-time overlaps or scheduling delays.',
       icon: <Shield3DIcon size={56} />,
     },
     {
@@ -171,30 +171,27 @@ export default function AboutUsPage({ onFindDoctors, onBookAppointment }) {
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
           <div>
             <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginBottom: 6 }}>
-              Available in Leading Indian Metropolitan Regions
+              Medora Hospital Main Campus
             </h3>
             <p style={{ fontSize: '0.92rem', color: '#64748B' }}>
-              Book in-person clinic appointments or consultations across major hubs:
+              Modern clinical facilities, diagnostics, and outpatient departments located in:
             </p>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-            {['New Delhi', 'Mumbai', 'Bengaluru', 'Hyderabad', 'Chennai', 'Pune'].map((city) => (
-              <span
-                key={city}
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  color: '#0F766E',
-                  fontWeight: 700,
-                  fontSize: '0.86rem',
-                  padding: '8px 16px',
-                  borderRadius: 12,
-                  border: '1px solid #CBD5E1',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
-                }}
-              >
-                📍 {city}
-              </span>
-            ))}
+            <span
+              style={{
+                backgroundColor: '#FFFFFF',
+                color: '#0F766E',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                padding: '10px 20px',
+                borderRadius: 12,
+                border: '1px solid #CBD5E1',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+              }}
+            >
+              🏥 Health City Avenue, Saket, New Delhi 110017
+            </span>
           </div>
         </div>
       </div>

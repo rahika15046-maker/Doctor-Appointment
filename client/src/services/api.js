@@ -1,14 +1,27 @@
 // Central API client for Medora Frontend
 
-const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
+const getApiBase = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return '/api';
+  }
+  return 'https://doctor-appointment-77wu.onrender.com/api';
+};
+
+const API_BASE = getApiBase();
 
 export async function request(path, options = {}) {
   const { method = 'GET', body, headers = {}, ...customConfig } = options;
   const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
 
+  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('medora_token') : null;
+  const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+
   const config = {
     method,
-    headers: isFormData ? { ...headers } : { 'Content-Type': 'application/json', ...headers },
+    headers: isFormData ? { ...authHeaders, ...headers } : { 'Content-Type': 'application/json', ...authHeaders, ...headers },
     credentials: 'include', // sends cookies
     ...customConfig,
   };
@@ -17,11 +30,22 @@ export async function request(path, options = {}) {
     config.body = isFormData ? body : JSON.stringify(body);
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
   let response;
   try {
-    response = await fetch(`${API_BASE}${path}`, config);
+    response = await fetch(`${API_BASE}${path}`, {
+      ...config,
+      signal: controller.signal,
+    });
   } catch (netErr) {
+    if (netErr.name === 'AbortError') {
+      throw new Error('Server request timed out. Please try again.');
+    }
     throw new Error('Network error. Please check server connectivity.');
+  } finally {
+    clearTimeout(timeoutId);
   }
 
   let data;
@@ -40,6 +64,10 @@ export async function request(path, options = {}) {
     throw error;
   }
 
+  if (data?.token && typeof localStorage !== 'undefined') {
+    localStorage.setItem('medora_token', data.token);
+  }
+
   return data;
 }
 
@@ -48,7 +76,15 @@ export const api = {
   login: (creds) => request('/auth/login', { method: 'POST', body: creds }),
   register: (userData) => request('/auth/register', { method: 'POST', body: userData }),
   googleLogin: (googleData) => request('/auth/google', { method: 'POST', body: googleData }),
-  logout: () => request('/auth/logout', { method: 'POST' }),
+  logout: async () => {
+    try {
+      await request('/auth/logout', { method: 'POST' });
+    } finally {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('medora_token');
+      }
+    }
+  },
   getMe: () => request('/auth/me'),
   updateProfile: (profileData) => request('/auth/profile', { method: 'PATCH', body: profileData }),
   uploadAvatar: (formData) => request('/auth/avatar', { method: 'POST', body: formData }),
