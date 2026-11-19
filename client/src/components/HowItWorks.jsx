@@ -1,5 +1,5 @@
 import React from 'react';
-import { SearchIcon, CalendarIcon, CheckCircleIcon, VideoIcon } from './Icons';
+import { SearchIcon, CalendarIcon, CheckCircleIcon, HospitalIcon } from './Icons';
 
 export default function HowItWorks() {
   const steps = [
@@ -23,9 +23,9 @@ export default function HowItWorks() {
     },
     {
       num: 4,
-      title: 'Consult Doctor',
-      desc: 'Visit in-person or connect via high-definition video telemedicine.',
-      icon: VideoIcon,
+      title: 'Consult at Hospital',
+      desc: 'Visit Medora Hospital Saket campus for your comprehensive in-person specialist consultation.',
+      icon: HospitalIcon,
     },
   ];
 

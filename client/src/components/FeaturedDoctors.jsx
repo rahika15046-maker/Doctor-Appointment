@@ -134,7 +134,7 @@ export default function FeaturedDoctors({ doctors = [], onBookDoctor, onSelectDo
                   fontSize: '0.72rem',
                   fontWeight: 600,
                 }}>
-                  In-Person & Online Video
+                  In-Person Hospital Visit
                 </div>
               </div>
 

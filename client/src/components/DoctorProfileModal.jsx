@@ -276,7 +276,7 @@ export default function DoctorProfileModal({
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <ShieldCheckIcon size={18} />
-                <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Consultation Modes: In-Person & Online Video</span>
+                <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Consultation Mode: In-Person Hospital OPD (Saket Campus)</span>
               </div>
             </div>
           )}

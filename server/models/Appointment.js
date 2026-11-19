@@ -18,6 +18,10 @@ const schema = new mongoose.Schema({
   isFollowup: { type: Boolean, default: false },
   currency: { type: String, default: 'INR' },
   status: { type: String, enum: ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'REJECTED'], default: 'PENDING' },
+  paymentMethod: { type: String, enum: ['RAZORPAY', 'PAY_ON_VISIT'], default: 'PAY_ON_VISIT' },
+  paymentStatus: { type: String, enum: ['PENDING', 'PAID', 'PAY_ON_VISIT'], default: 'PENDING' },
+  paymentId: String,
+  razorpayOrderId: String,
   referenceId: { type: String, required: true, unique: true },
   idempotencyKey: String,
 }, { timestamps: true });

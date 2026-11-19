@@ -302,7 +302,7 @@ export default function MyAppointments({
                   <ClockIcon size={15} />
                   <span>{new Date(appt.startAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                   <span>•</span>
-                  <span>{appt.consultationType === 'IN_PERSON' ? 'In-Person' : 'Online Video'}</span>
+                  <span>In-Person Visit</span>
                 </div>
               </div>
 

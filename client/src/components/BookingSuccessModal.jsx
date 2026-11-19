@@ -73,7 +73,7 @@ export default function BookingSuccessModal({
             />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0F172A' }}>{doctor.name}</div>
-              <div style={{ fontSize: '0.8rem', color: '#64748B' }}>{doctor.specialization} • {appointment.consultationType === 'IN_PERSON' ? 'In-Person' : 'Online Video'}</div>
+              <div style={{ fontSize: '0.8rem', color: '#64748B' }}>{doctor.specialization} • In-Person Hospital Visit</div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0D9488' }}>

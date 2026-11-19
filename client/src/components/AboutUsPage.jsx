@@ -18,7 +18,7 @@ import {
 
 export default function AboutUsPage({ onFindDoctors, onBookAppointment }) {
   const stats = [
-    { value: '50,000+', label: 'Successful Consultations', desc: 'Across outpatient clinics & video consultations' },
+    { value: '50,000+', label: 'Successful Consultations', desc: 'Across outpatient clinics & specialist diagnostic suites' },
     { value: '4', label: 'Clinical Departments', desc: 'General Medicine, Cardiology, Orthopedics & Pediatrics' },
     { value: '450+', label: 'Bed Capacity', desc: 'State-of-the-art ICU, surgical suites & emergency care' },
     { value: '98.8%', label: 'Patient Satisfaction', desc: 'Based on genuine post-care patient reviews' },

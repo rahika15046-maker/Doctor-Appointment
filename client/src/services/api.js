@@ -129,6 +129,10 @@ export const api = {
   rescheduleAppointment: (id, newSlotId) =>
     request(`/appointments/${id}/reschedule`, { method: 'PATCH', body: { newSlotId } }),
 
+  // Payments (Razorpay)
+  createRazorpayOrder: (orderData) => request('/payments/razorpay/order', { method: 'POST', body: orderData }),
+  verifyRazorpayPayment: (paymentData) => request('/payments/razorpay/verify', { method: 'POST', body: paymentData }),
+
   // Dashboard Stats
   getDashboardStats: () => request('/dashboard/stats'),
 
