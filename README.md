@@ -1,521 +1,573 @@
-# 🏥 MEDORA Hospital — Enterprise Single-Hospital Healthcare Platform
+# 🏥 MEDORA Hospital — In-Person Healthcare & OPD Scheduling Platform
 
-[![Build Status](https://img.shields.io/badge/Build-Passing-emerald?style=for-the-badge&logo=vite)](https://github.com/rahika15046-maker/Doctor-Appointment)
-[![Node.js](https://img.shields.io/badge/Node.js-v20%2B-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-v18-cyan?style=for-the-badge&logo=react)](https://react.dev/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas%20Ready-darkgreen?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
-[![Tests](https://img.shields.io/badge/Tests-100%25%20Passing-brightgreen?style=for-the-badge&logo=jest)](https://github.com/rahika15046-maker/Doctor-Appointment)
-[![Concurrency](https://img.shields.io/badge/Slot%20Lock-HTTP%20409%20Atomic-blueviolet?style=for-the-badge)](https://github.com/rahika15046-maker/Doctor-Appointment)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+<div align="center">
 
----
+![Medora Hospital Banner](https://img.shields.io/badge/MEDORA_HOSPITAL-In--Person_OPD_Scheduling-0D9488?style=for-the-badge&logo=hospital&logoColor=white)
 
-## 📌 Executive Summary & Clinical Mission
+[![Live Web Application](https://img.shields.io/badge/Live_App-medora--doctorappointment.vercel.app-0284C7?style=for-the-badge&logo=vercel&logoColor=white)](https://medora-doctorappointment.vercel.app)
+[![API Production](https://img.shields.io/badge/Production_API-doctor--appointment--77wu.onrender.com-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://doctor-appointment-77wu.onrender.com)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Doctor--Appointment-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/rahika15046-maker/Doctor-Appointment)
 
-**MEDORA Hospital** is a modern, single-hospital web platform engineered specifically for **Medora Hospital** — an accredited multi-specialty healthcare institution. Unlike doctor marketplaces, multi-clinic aggregators, or third-party discovery apps, MEDORA is dedicated exclusively to Medora Hospital's clinical departments, board-certified physicians, and patients.
+<br/>
 
-All clinical facilities, doctors, appointment scheduling schedules, surgical consults, inpatient/outpatient admissions, and diagnostic lab reports belong strictly to **Medora Hospital**.
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-v20-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.x-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB Atlas](https://img.shields.io/badge/MongoDB-Atlas_v7.0-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://www.mongodb.com/atlas)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Postman Docs](https://img.shields.io/badge/Postman-API_Docs-FF6C37?style=flat-square&logo=postman&logoColor=white)](https://documenter.getpostman.com/)
+[![Concurrency Engine](https://img.shields.io/badge/Slot_Lock-Atomic_HTTP_409-7C3AED?style=flat-square&logo=shield&logoColor=white)](#-simultaneous-booking-concurrency--double-booking-prevention)
+[![Build & Tests](https://img.shields.io/badge/Tests-100%25_Passing-10B981?style=flat-square&logo=jest&logoColor=white)](#-testing--quality-assurance)
 
-### Key Architectural Tenets:
-1. **Single-Hospital Domain**: Zero third-party marketplace clutter, zero GPS/geolocation prompts, zero arbitrary city filters. Every doctor and department is physically or digitally connected to Medora Hospital.
-2. **Predictable Session Pricing in Indian Rupees (₹)**: Transparent, flat session fees with automated discounts on clinical follow-ups. No ambiguous per-minute charges.
-3. **Atomic Slot Reservation & Concurrency Lock**: Backend database-level slot reservation that eliminates race conditions and double bookings. If two patients attempt to book the identical slot simultaneously, the transaction commits atomically for the first patient (HTTP 201) and issues an immediate, friendly HTTP 409 Conflict with auto-slot refresh for the competing patient.
-4. **Comprehensive 6-Step Clinical Booking Journey**: Service Selection ➔ Doctor Selection ➔ Consultation Mode (In-Person OPD vs Encrypted Video) ➔ Date & Slot Picker ➔ Patient Notes & Lab Report Upload ➔ Review & Instant Reference Lock (`MED-YYYY-XXXXXXXX`).
-5. **Dual Database Engine**: Operates seamlessly with production MongoDB Atlas or an embedded zero-setup in-memory data engine seeded with Priya Sharma, 8 doctors, appointments, medical records, notifications, and 10 hospital departments.
+<br/>
 
----
+**A dedicated, production-grade full-stack healthcare platform engineered exclusively for Medora Hospital.**  
+*Empowering patients to discover board-certified hospital specialists, bundle in-house diagnostic tests, and confirm zero-conflict in-person OPD appointments with atomic double-booking prevention.*
 
-## 🖼️ User Interface & Platform Overview
-
-The Medora user interface was built to meet pixel-perfect hospital design specifications with 3D volumetric visual accents, responsive layouts, accessible contrast, and fluid modal workflows.
-
-![Medora Healthcare Platform Interface](docs/screenshots/medora-ui-overview.jpg)
-
-*Figure 1: Medora Hospital Clinical Web Platform — Landing Page, Authentication, 6-Step Booking Flow, Patient Dashboard, My Appointments with Year Filtering, and Confirmation Modals.*
+</div>
 
 ---
 
-## 🏗️ 1. System Architecture
+## 📑 Table of Contents
 
-```mermaid
-flowchart TD
-    subgraph Client ["Frontend Architecture (React 18 + Redux Thunk + Vite)"]
-        UI[Responsive UI Layer / Tailwind CSS]
-        Nav[Navbar & Global Routing]
-        HeroSec[Hero & Department Badges]
-        SrvSec[Hospital Services Directory]
-        DocDir[Medora Doctors Directory]
-        BookWiz[6-Step Booking Wizard]
-        Dash[Patient Dashboard & Stats]
-        ApptList[My Appointments & Year Filter]
-        ReduxStore[(Redux Store)]
-        APIService[Axios API Client / Interceptors]
+- [Executive Summary](#-executive-summary)
+- [Live Deployments & Key Links](#-live-deployments--key-links)
+- [Core Features & Engineering Highlights](#-core-features--engineering-highlights)
+- [System Architecture](#-system-architecture)
+- [Authentication & Security Flow](#-authentication--security-flow)
+- [OPD Doctor & Diagnostic Discovery Flow](#-opd-doctor--diagnostic-discovery-flow)
+- [6-Step In-Person Booking Workflow](#-6-step-in-person-booking-workflow)
+- [Simultaneous Booking Concurrency & Double-Booking Prevention](#-simultaneous-booking-concurrency--double-booking-prevention)
+- [Database Schema & Entity Relationships](#-database-schema--entity-relationships)
+- [REST API Specifications](#-rest-api-specifications)
+- [Frontend State Architecture](#-frontend-state-architecture)
+- [Collaborative Development & Team Contributions](#-collaborative-development--team-contributions)
+- [Testing & Quality Assurance](#-testing--quality-assurance)
+- [Key Engineering Best Practices](#-key-engineering-best-practices)
 
-        UI --> Nav & HeroSec & SrvSec & DocDir & BookWiz & Dash & ApptList
-        Nav & DocDir & BookWiz & Dash & ApptList --> ReduxStore
-        ReduxStore --> APIService
-    end
+---
 
-    subgraph Transport ["Secure Transport & Session Layer"]
-        HTTP[HTTPS REST APIs / Credentials Mode]
-        Cookies[HTTP-Only JWT Cookie / Bearer Token]
-    end
+## 📌 Executive Summary
 
-    subgraph Server ["Backend Architecture (Node.js + Express.js)"]
-        Middleware[Security Middleware: Helmet / CORS / Rate-Limit]
-        AuthMW[Auth Middleware / Token Verification]
-        Router[Centralized Express Router /api]
-        AuthCtrl[Auth Controller & Bcrypt]
-        DocCtrl[Doctor & Department Controller]
-        SrvCtrl[Hospital Services Controller]
-        ApptCtrl[Appointment Controller]
-        SlotService[Atomic Slot Reservation Engine]
+**MEDORA Hospital** is a single-hospital OPD appointment and diagnostic scheduling system. Unlike third-party aggregator marketplaces, MEDORA is designed exclusively for **Medora Hospital** and its on-campus clinical divisions.
 
-        Middleware --> Router
-        Router --> AuthMW
-        AuthMW --> AuthCtrl & DocCtrl & SrvCtrl & ApptCtrl
-        ApptCtrl --> SlotService
-    end
+All physicians, diagnostic equipment, 45-minute OPD time slots, patient intake records, and surgical follow-ups are tied directly to Medora Hospital's departments.
 
-    subgraph Storage ["Data Persistence Engine"]
-        EngineRouter{Engine Router: MONGODB_URI?}
-        MongoAtlas[(MongoDB Atlas / Replica Set)]
-        InMemory[(Medora Resilient In-Memory DB)]
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                 MEDORA HOSPITAL PLATFORM                               │
+├──────────────────────────┬──────────────────────────────┬──────────────────────────────┤
+│ 🩺 In-Person OPD Visits  │ 🔬 Diagnostic Test Bundling  │ ⚡ Atomic Concurrency Lock   │
+│ Strictly on-campus hospital │ X-Ray, CT, 1.5T MRI, Ultra-  │ Atomic findOneAndUpdate      │
+│ consultations with zero  │ sound, and full Blood Panels │ eliminates double-booking    │
+│ telemedicine confusion   │ bundled with doctor visits   │ with HTTP 409 Conflict logic │
+└──────────────────────────┴──────────────────────────────┴──────────────────────────────┘
+```
 
-        SlotService & DocCtrl & SrvCtrl & AuthCtrl --> EngineRouter
-        EngineRouter -- "Configured" --> MongoAtlas
-        EngineRouter -- "Fallback / Dev" --> InMemory
-    end
+### Core Problems Solved:
+1. **Elimination of OPD Reception Queues**: Patients select their doctor, review transparent session fees, bundle tests, and confirm slots before stepping onto the hospital campus.
+2. **Double-Booking Elimination**: Mitigates race conditions when multiple patients submit bookings for the exact same doctor and slot simultaneously.
+3. **Transparent Consultation Pricing**: Automatic detection of first-time visits vs. discounted follow-up visits calculated in Indian Rupees (₹).
+4. **Unified Diagnostic Integration**: In-house lab and radiology tests can be attached directly to the OPD consultation, preventing fragmented hospital bills.
 
-    APIService -->|JSON / multipart-form| HTTP
-    HTTP --> Middleware
-    Cookies -.->|Session Token| AuthMW
+---
+
+## 🌐 Live Deployments & Key Links
+
+| Environment / Asset | Target URL | Status | Hosting Infrastructure |
+|---|---|:---:|---|
+| **Production Web Application** | [medora-doctorappointment.vercel.app](https://medora-doctorappointment.vercel.app) | ![Active](https://img.shields.io/badge/Active-10B981?style=flat-square) | Vercel Edge Network |
+| **Backend REST API Server** | [doctor-appointment-77wu.onrender.com](https://doctor-appointment-77wu.onrender.com) | ![Active](https://img.shields.io/badge/Active-10B981?style=flat-square) | Render Cloud Services (Node.js) |
+| **Database Cluster** | MongoDB Atlas Replica Set | ![Active](https://img.shields.io/badge/Active-10B981?style=flat-square) | MongoDB Atlas Cloud (AWS Mumbai) |
+| **API Health Check** | [/api/health](https://doctor-appointment-77wu.onrender.com/api/health) | ![200 OK](https://img.shields.io/badge/200_OK-0284C7?style=flat-square) | Render Express Engine |
+| **GitHub Source Repository** | [Doctor-Appointment](https://github.com/rahika15046-maker/Doctor-Appointment) | ![Public](https://img.shields.io/badge/Public-181717?style=flat-square) | Git Version Control |
+
+---
+
+## ✨ Core Features & Engineering Highlights
+
+```
+   ┌───────────────────────────────────────────────────────────────────────────────────────┐
+   │                                  KEY SYSTEM HIGHLIGHTS                                │
+   ├───────────────────────────┬───────────────────────────┬───────────────────────────────┤
+   │ 🔐 Enterprise Auth        │ 👨‍⚕️ Verified Doctor OPD    │ ⚡ Atomic Slot Lock           │
+   │ • JWT + Secure Cookie     │ • 4 Core Hospital Depts   │ • MongoDB findOneAndUpdate    │
+   │ • bcrypt (salt rounds=10) │ • First Visit vs Followup │ • HTTP 409 Conflict Handling  │
+   │ • select: false passwords │ • 45-minute OPD slots     │ • Client-side auto-refresh    │
+   ├───────────────────────────┼───────────────────────────┼───────────────────────────────┤
+   │ 🔬 Diagnostic Bundling    │ 📑 Patient Portal         │ 🛡️ Cloud Resilience           │
+   │ • Digital X-Ray, CT Scan  │ • Real-time notifications │ • Non-blocking 0.0.0.0 bind   │
+   │ • 1.5 Tesla MRI, Blood    │ • Medical report storage  │ • Central error middleware    │
+   │ • Fixed ₹ INR pricing     │ • Year-based visit filter │ • Idempotent booking keys     │
+   └───────────────────────────┴───────────────────────────┴───────────────────────────────┘
 ```
 
 ---
 
-## 🔐 2. Patient Registration & Authentication Flow
+## 🏗️ System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client ["Frontend Architecture (React 18 + Tailwind CSS + Vite)"]
+        UI["Modern UI Layer (Tailwind CSS Mobile-First)"]
+        Nav["Global Navigation & Auth Modals"]
+        Hero["Hospital Hero & Quick Actions"]
+        DeptDir["Hospital Departments Directory"]
+        DocDir["Medora Doctors Catalog & Profile Modals"]
+        DiagDir["Diagnostic Lab & Radiology Directory"]
+        BookWiz["6-Step In-Person Booking Wizard"]
+        PatientPortal["Patient Dashboard & Appointments History"]
+        AxiosClient["Axios Client (withCredentials / Interceptors)"]
+
+        UI --> Nav & Hero & DeptDir & DocDir & DiagDir & BookWiz & PatientPortal
+        BookWiz & PatientPortal & Nav --> AxiosClient
+    end
+
+    subgraph Security ["Transport & Session Security"]
+        HTTPS["HTTPS REST Transport"]
+        JWTToken["Stateless JWT / Dual Cookie & Bearer"]
+    end
+
+    subgraph Server ["Backend Architecture (Node.js + Express.js)"]
+        SecurityMW["Security Headers & CORS Whitelist"]
+        AuthMW["JWT Verification Middleware (select: '+password')"]
+        CentralRouter["Express Router (/api)"]
+        AuthCtrl["Auth & Profile Controller"]
+        DocCtrl["Doctor & Department Controller"]
+        ServiceCtrl["Hospital Diagnostic Services Controller"]
+        ApptCtrl["Appointment Controller"]
+        LockEngine["Atomic Slot Reservation Engine (claimSlot)"]
+        ErrorMW["Centralized Error Handling Middleware"]
+
+        SecurityMW --> CentralRouter
+        CentralRouter --> AuthMW
+        AuthMW --> AuthCtrl & DocCtrl & ServiceCtrl & ApptCtrl
+        ApptCtrl --> LockEngine
+        LockEngine --> CentralRouter
+        CentralRouter --> ErrorMW
+    end
+
+    subgraph Database ["Persistence Layer (MongoDB Atlas Cluster)"]
+        AtlasCluster[("MongoDB Atlas Replica Set")]
+        UsersCol[("users Collection")]
+        DoctorsCol[("doctors Collection")]
+        SlotsCol[("appointment_slots Collection")]
+        ServicesCol[("services Collection")]
+        ApptsCol[("appointments Collection")]
+        RecordsCol[("medical_records Collection")]
+        NotifsCol[("notifications Collection")]
+
+        AtlasCluster --> UsersCol & DoctorsCol & SlotsCol & ServicesCol & ApptsCol & RecordsCol & NotifsCol
+        LockEngine -->|Atomic findOneAndUpdate| SlotsCol
+        ApptCtrl --> ApptsCol
+        AuthCtrl --> UsersCol
+        DocCtrl --> DoctorsCol
+        ServiceCtrl --> ServicesCol
+    end
+
+    AxiosClient -->|JSON Requests| HTTPS
+    HTTPS --> SecurityMW
+    JWTToken -.->|Authorization| AuthMW
+    Server --> AtlasCluster
+```
+
+---
+
+## 🔐 Authentication & Security Flow
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Patient
-    participant UI as Medora Auth Modal
-    participant API as /api/auth/register
-    participant DB as Medora DB Engine
+    actor Patient as Patient (Browser)
+    participant Modal as React Auth Modal
+    participant API as /api/auth/login
+    participant DB as MongoDB Atlas (users)
 
-    Patient->>UI: Enter Full Name, Email, Phone, Password, Confirm Password
-    UI->>UI: Client-Side Validation (Strength meter, matching passwords, phone regex)
+    Patient->>Modal: Enter Email & Password
+    Modal->>Modal: Client-Side Input Validation (email format & length)
+    Modal->>API: POST /api/auth/login { email, password }
+    API->>DB: User.findOne({ email }).select('+password')
     
-    alt Validation Failed
-        UI-->>Patient: Display inline error message (e.g. "Passwords must match")
-    else Validation Successful
-        UI->>API: POST /api/auth/register { name, email, phone, password }
-        API->>DB: User.findOne({ email })
-        
-        alt Duplicate Email Exists
-            DB-->>API: Existing user record found
-            API-->>UI: HTTP 409 Conflict: "Email already registered"
-            UI-->>Patient: Display "Email already registered. Please login instead."
-        else Unique Email
-            API->>API: bcrypt.hash(password, 10)
-            API->>DB: User.create({ name, email, phone, passwordHash, role: 'PATIENT' })
-            DB-->>API: Saved User Document (ID, Name, Email)
-            API->>API: Generate signed JWT (Expires in 7 days)
-            API-->>UI: HTTP 201 Created + Set-Cookie: token (httpOnly)
-            UI->>Patient: Instant login success notification & redirect to Dashboard
+    alt User Not Found
+        DB-->>API: null
+        API-->>Modal: HTTP 401 Unauthorized: "Invalid credentials"
+        Modal-->>Patient: Display inline warning banner
+    else User Exists
+        DB-->>API: User Document with password hash
+        API->>API: bcrypt.compare(password, user.password)
+        alt Password Mismatch
+            API-->>Modal: HTTP 401 Unauthorized: "Invalid credentials"
+            Modal-->>Patient: Display invalid password alert
+        else Password Valid
+            API->>API: jwt.sign({ id, email, role }, JWT_SECRET, { expiresIn: '7d' })
+            API-->>Modal: HTTP 200 OK + JWT Token + User Profile Data
+            Modal->>Modal: Store Auth State in Context & update Navigation
+            Modal-->>Patient: Instant success confirmation & dashboard access
         end
     end
 ```
 
 ---
 
-## 🩺 3. Hospital Services & Medora Doctor Discovery Flow
+## 🩺 OPD Doctor & Diagnostic Discovery Flow
 
 ```mermaid
 flowchart LR
-    Start([Patient visits Medora Website]) --> Browse{"Browse Mode"}
-    
-    Browse -->|Explore Departments| ServicesPage["/services (Hospital Services)"]
-    Browse -->|Find by Doctor Name| DoctorsPage["/our-doctors (Medora Doctors)"]
+    Start([Patient visits Medora Hospital]) --> SelectPath{"Discovery Mode"}
 
-    subgraph ServiceFlow ["Hospital Services Discovery"]
-        ServicesPage --> ViewCards["10 Accredited Departments\n(Cardiology, Neurology, Pediatrics, etc.)"]
-        ViewCards --> SrvDetail["Service Overview, Clinical Benefits & ₹ Session Rates"]
-        SrvDetail --> FilterDoc["Click 'Consult Specialist'"]
+    SelectPath -->|Browse Departments| ServicesPage["Explore Services (/services)"]
+    SelectPath -->|Browse Specialists| DoctorsPage["Search Doctors (/our-doctors)"]
+
+    subgraph Diagnostics ["Hospital Diagnostics"]
+        ServicesPage --> LabGrid["5 Specialized Test Packages\n(MRI, CT, X-Ray, Sonography, Blood Tests)"]
+        LabGrid --> ServiceDetail["Test Specs, Prep Instructions & ₹ Starting Prices"]
+        ServiceDetail --> AttachTest["Bundle Test with Doctor Visit"]
     end
 
-    subgraph DoctorFlow ["Medora Doctors Directory"]
-        DoctorsPage --> FilterBar["Filter by Medora Department & Search Name"]
-        FilterDoc --> FilterBar
-        FilterBar --> DocList["Medora Doctors Grid (Hospital: Medora Hospital)"]
-        DocList --> ViewProfile["Doctor Profile Modal\n(Experience, Credentials, Rating, Availability)"]
-        ViewProfile --> StartBooking["Initiate Booking Flow with Doctor Pre-Selected"]
+    subgraph Specialists ["Medora Hospital OPD Specialists"]
+        DoctorsPage --> FilterDepts["Filter by Department\n(Cardiology, Orthopedics, Pediatrics, Medicine)"]
+        AttachTest --> FilterDepts
+        FilterDepts --> DocCards["Doctor Cards with 'In-Person OPD Only' Badge"]
+        DocCards --> DocModal["Doctor Profile Modal\n(Degrees, Experience, Reviews, ₹ Fees)"]
+        DocModal --> LaunchBooking["Launch 6-Step In-Person Booking Flow"]
     end
 
-    StartBooking --> BookingWiz["6-Step Booking Wizard"]
+    LaunchBooking --> BookingWizard["6-Step In-Person Booking Wizard"]
 ```
 
 ---
 
-## 📅 4. 6-Step Appointment Booking Workflow
+## 📅 6-Step In-Person Booking Workflow
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Step1_ServiceSelection
-    Step1_ServiceSelection --> Step2_DoctorSelection: Select Hospital Department / Service
-    Step2_DoctorSelection --> Step3_ConsultationMode: Select Board-Certified Medora Doctor
-    Step3_ConsultationMode --> Step4_DateTimeSlots: Choose In-Person OPD or Encrypted Video
-    Step4_DateTimeSlots --> Step5_DetailsAndReports: Pick Calendar Date & Live Available Slot
-    Step5_DetailsAndReports --> Step6_ReviewAndLock: Enter Reason, Medical History & Upload Reports
+    [*] --> Step1_Department: 1. Select Hospital Department
+    Step1_Department --> Step2_Doctor: 2. Choose Board-Certified Specialist
+    Step2_Doctor --> Step3_Mode: 3. Consultation Mode (Locked to In-Person OPD)
+    Step3_Mode --> Step4_Slots: 4. Calendar Date & Available 45-Min Slot
+    Step4_Slots --> Step5_Intake: 5. Chief Complaint & Optional Diagnostic Bundling
     
-    state Step6_ReviewAndLock {
-        [*] --> CheckFee: Dynamic Fee Calculation (First Visit ₹1000 vs Follow-Up ₹600/₹700)
-        CheckFee --> ReviewSummary: Review Patient Info, Doctor & Slot
-        ReviewSummary --> SubmitLock: Click 'Confirm & Book Appointment'
+    state Step6_Confirmation {
+        [*] --> PriceCheck: Calculate Fee (First Visit ₹1000 vs Follow-Up ₹600/₹700)
+        PriceCheck --> ReviewDetails: Review Patient Info, Doctor & OPD Room
+        ReviewDetails --> SubmitLock: Click 'Confirm & Book OPD Appointment'
     }
 
-    Step6_ReviewAndLock --> BookingSuccess: Atomic Slot Lock (HTTP 201)
-    Step6_ReviewAndLock --> Step4_DateTimeSlots: Slot Conflict (HTTP 409) -> Auto Refresh Slots
-    BookingSuccess --> [*]: Reference ID Generated (MED-YYYY-XXXXXXXX)
+    Step5_Intake --> Step6_Confirmation
+    Step6_Confirmation --> BookingSuccess: Atomic Claim Succeeded (HTTP 201)
+    Step6_Confirmation --> Step4_Slots: Slot Taken Concurrently (HTTP 409) -> Auto-Reload Slots
+    BookingSuccess --> [*]: Reference ID Issued (MED-YYYY-XXXXXXXX)
 ```
 
 ---
 
-## ⚡ 5. Simultaneous Booking Concurrency & Double-Booking Prevention
+## ⚡ Simultaneous Booking Concurrency & Double-Booking Prevention
+
+A common failure in appointment booking systems occurs when two patients attempt to book the identical time slot of a physician at the exact same moment.
+
+```
+       Patient A (Submits 10:00:00.100) ──────┐
+                                              ├──►  [ MongoDB Atlas Atomic Transaction ]
+       Patient B (Submits 10:00:00.105) ──────┘
+                                                              │
+                       ┌──────────────────────────────────────┴──────────────────────────────────────┐
+                       ▼                                                                             ▼
+          [ Patient A Wins Claim ]                                                      [ Patient B Conflict ]
+         findOneAndUpdate matches:                                                     findOneAndUpdate matches:
+        status: "AVAILABLE" ➔ "BOOKED"                                                status: "AVAILABLE" ➔ FAILS (null)
+                       │                                                                             │
+                       ▼                                                                             ▼
+               HTTP 201 Created                                                              HTTP 409 Conflict
+        Booking Confirmed: MED-2026-XXXXXXXX                                      "Slot already booked. Refreshing..."
+```
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Patient_A as Patient A (Aarav)
-    actor Patient_B as Patient B (Rohit)
-    participant Server as Medora Backend Router
-    participant Service as Appointment Service (claimSlot)
-    participant SlotDB as Slots & Appointment DB
+    actor Patient_A as Patient A (Browser 1)
+    actor Patient_B as Patient B (Browser 2)
+    participant Router as Express Appointment Router
+    participant Service as appointment.service.js
+    participant SlotDB as MongoDB Atlas (appointment_slots)
+    participant ApptDB as MongoDB Atlas (appointments)
 
-    Note over Patient_A,Patient_B: Both patients select Dr. Sarah Johnson on 2026-11-06 at 10:00 AM (Slot #S101)
+    Note over Patient_A,Patient_B: Both patients select Dr. Robert Brown (Cardiology) on Nov 25 at 10:00 AM (Slot #S101)
 
-    par Simultaneous Requests Arrive
-        Patient_A->>Server: POST /api/appointments { doctorId, slotId: "S101", ... }
-        Patient_B->>Server: POST /api/appointments { doctorId, slotId: "S101", ... }
+    par Parallel Requests Dispatched
+        Patient_A->>Router: POST /api/appointments { doctorId, slotId: "S101", ... }
+        Patient_B->>Router: POST /api/appointments { doctorId, slotId: "S101", ... }
     end
 
-    Note over Server,SlotDB: Atomic Claim Execution (Atomic findOneAndUpdate / Mutex Lock)
-
-    critical Slot S101 Acquisition
-        Server->>Service: claimSlot("S101", patientA.id)
-        Service->>SlotDB: findOneAndUpdate({ _id: "S101", status: "AVAILABLE" }, { status: "BOOKED", bookedBy: patientA.id })
-        SlotDB-->>Service: Updated Slot Document (Status: BOOKED)
-        Service-->>Server: Claim SUCCESS (Patient A)
-        Server->>SlotDB: Appointment.create({ referenceId: "MED-2026-0B1017CC", ... })
-        Server-->>Patient_A: HTTP 201 Created { referenceId: "MED-2026-0B1017CC", status: "CONFIRMED" }
-    option Competing Claim by Patient B
-        Server->>Service: claimSlot("S101", patientB.id)
-        Service->>SlotDB: findOneAndUpdate({ _id: "S101", status: "AVAILABLE" }, { status: "BOOKED", bookedBy: patientB.id })
-        SlotDB-->>Service: NULL (Slot is no longer AVAILABLE)
-        Service-->>Server: Claim FAILED (Slot already occupied)
-        Server-->>Patient_B: HTTP 409 Conflict: "Slot already reserved. Please select another time."
+    critical Atomic Slot Acquisition
+        Router->>Service: claimSlot("S101", patientA.id)
+        Service->>SlotDB: findOneAndUpdate({ _id: "S101", doctorId, status: "AVAILABLE" }, { status: "BOOKED" })
+        SlotDB-->>Service: Updated Slot Document (status: 'BOOKED')
+        Service-->>Router: Slot Claim Confirmed
+        Router->>ApptDB: Appointment.create({ referenceId: "MED-2026-44F2810C", ... })
+        Router-->>Patient_A: HTTP 201 Created { referenceId: "MED-2026-44F2810C", status: "CONFIRMED" }
+    option Competing Request Attempt
+        Router->>Service: claimSlot("S101", patientB.id)
+        Service->>SlotDB: findOneAndUpdate({ _id: "S101", doctorId, status: "AVAILABLE" }, { status: "BOOKED" })
+        SlotDB-->>Service: null (Condition not met; slot is already 'BOOKED')
+        Service-->>Router: Slot Claim Rejected
+        Router-->>Patient_B: HTTP 409 Conflict: "This slot was just booked by another patient."
     end
 
-    Patient_A->>Patient_A: Shows Booking Success Modal with Reference ID & Email Confirmation
-    Patient_B->>Patient_B: Shows Warning Alert & Instantly Refreshes Available Slots for that Date
+    Patient_A->>Patient_A: Booking Success Modal displayed with Reference ID
+    Patient_B->>Patient_B: Toast Alert shown; active slots auto-refreshed; intake data preserved
 ```
 
 ---
 
-## 🗄️ 6. Database Entity-Relationship Diagram (ERD)
+## 🗄️ Database Schema & Entity Relationships
 
 ```mermaid
 erDiagram
-    USER ||--o{ APPOINTMENT : books
-    USER ||--o{ MEDICAL_RECORD : owns
-    USER ||--o{ NOTIFICATION : receives
-    DOCTOR ||--o{ APPOINTMENT : attends
-    DOCTOR ||--o{ AVAILABILITY_SLOT : schedules
-    SERVICE ||--o{ DOCTOR : employs
-    SERVICE ||--o{ APPOINTMENT : categorizes
-    APPOINTMENT ||--|| AVAILABILITY_SLOT : occupies
+    USER ||--o{ APPOINTMENT : "books"
+    USER ||--o{ MEDICAL_RECORD : "uploads"
+    USER ||--o{ NOTIFICATION : "receives"
+    DOCTOR ||--o{ APPOINTMENT : "consults"
+    DOCTOR ||--o{ APPOINTMENT_SLOT : "allocates"
+    SERVICE ||--o{ APPOINTMENT : "bundled into"
+    APPOINTMENT ||--|| APPOINTMENT_SLOT : "claims (1:1)"
 
     USER {
         ObjectId _id PK
-        string name
-        string email UK
-        string phone
-        string passwordHash
+        string name "Patient Full Name"
+        string email UK "Unique index"
+        string password "bcrypt hash (select: false)"
+        string phone "Contact Mobile Number"
         string role "PATIENT | DOCTOR | ADMIN"
-        string bloodGroup
-        string dateOfBirth
-        string gender
-        string avatar
-        boolean isActive
+        string bloodGroup "A+, B+, O+, AB+"
+        string dateOfBirth "YYYY-MM-DD"
+        string gender "Male | Female | Other"
+        number profileCompletion "0 to 100%"
         date createdAt
     }
 
     DOCTOR {
         ObjectId _id PK
-        string name
-        string email UK
-        string phone
+        string name "Dr. Robert Brown"
+        string department "Cardiology | Medicine | Orthopedics"
+        string specialization "Board Certified Specialty"
+        string qualification "MBBS, MD, DM"
         string hospital "Medora Hospital"
-        string designation "Senior Consultant | HOD"
-        string department
-        string specialization
-        number experienceYears
-        number rating
-        number reviewCount
-        number firstVisitFee "INR ₹"
-        number followupFee "INR ₹"
-        string[] servicesOffered
-        string bio
-        string avatar
-        boolean isAvailable
+        number consultationFee "INR ₹ Base"
+        number firstVisitFee "INR ₹ First Visit"
+        number followupFee "INR ₹ Discounted Follow-up"
+        string[] consultationTypes "['IN_PERSON']"
+        number averageRating "4.8 / 5.0"
+        string verificationStatus "VERIFIED"
+    }
+
+    APPOINTMENT_SLOT {
+        ObjectId _id PK
+        ObjectId doctorId FK "Ref: Doctor"
+        date startAt "Slot start timestamp (45 min)"
+        date endAt "Slot end timestamp"
+        string status "AVAILABLE | BOOKED"
+        ObjectId appointmentId FK "Sparse 1:1 Link"
     }
 
     SERVICE {
         ObjectId _id PK
-        string name
-        string department
-        string category
-        string description
-        string overview
-        string[] benefits
-        number startingPrice "INR ₹"
-        string icon
-        boolean isActive
-    }
-
-    AVAILABILITY_SLOT {
-        ObjectId _id PK
-        ObjectId doctorId FK
-        string date "YYYY-MM-DD"
-        string startTime "HH:mm"
-        string endTime "HH:mm"
-        string status "AVAILABLE | BOOKED | BLOCKED"
-        ObjectId bookedBy FK
+        string title "Digital X-Ray | CT Scan | 1.5T MRI"
+        string department "Radiology | Pathology | Lab"
+        number startingPrice "INR ₹ (e.g. ₹600, ₹2500, ₹4000)"
+        string[] features "1.5 Tesla, High-Resolution, 128 Slice"
     }
 
     APPOINTMENT {
         ObjectId _id PK
         string referenceId UK "MED-YYYY-XXXXXXXX"
-        ObjectId patientId FK
-        ObjectId doctorId FK
-        ObjectId serviceId FK
-        string serviceName
-        date startAt
-        date endAt
-        string consultationType "IN_PERSON | ONLINE"
-        number consultationFee "INR ₹"
-        boolean isFollowup
-        string status "CONFIRMED | PENDING | COMPLETED | CANCELLED"
-        string reason
-        string additionalComments
-        json medicalReports
+        ObjectId patientId FK "Ref: User"
+        ObjectId doctorId FK "Ref: Doctor"
+        ObjectId serviceId FK "Ref: Service (optional bundle)"
+        ObjectId slotId FK "Ref: AppointmentSlot (1:1)"
+        date startAt "Consultation start"
+        date endAt "Consultation end"
+        string consultationType "IN_PERSON"
+        string reason "Chief medical complaint"
+        number consultationFee "Calculated fee in INR ₹"
+        boolean isFollowup "Discount flag"
+        string status "CONFIRMED | CANCELLED"
+        string paymentMethod "PAY_ON_VISIT | RAZORPAY"
+        string idempotencyKey UK "Sparse unique index"
         date createdAt
     }
 
     MEDICAL_RECORD {
         ObjectId _id PK
-        ObjectId patientId FK
-        string title
-        string recordType "LAB_REPORT | PRESCRIPTION | SCAN"
-        string doctorName
-        date recordDate
-        string fileUrl
+        ObjectId patientId FK "Ref: User"
+        string title "Prescription / Scan Name"
+        string type "PRESCRIPTION | LAB_REPORT | SCAN"
+        string fileUrl "Storage link"
+        date createdAt
     }
 
     NOTIFICATION {
         ObjectId _id PK
-        ObjectId userId FK
-        string title
-        string message
-        string type "APPOINTMENT | REPORT | SYSTEM"
-        boolean read
+        ObjectId userId FK "Ref: User"
+        string title "Booking Confirmed"
+        string message "Details and OPD room"
+        boolean isRead "Read status"
         date createdAt
     }
 ```
 
 ---
 
-## 📡 REST API Reference
+## 📡 REST API Specifications
 
-| Method | Endpoint | Description | Auth Required | Success Code |
-|---|---|---|:---:|:---:|
-| `POST` | `/api/auth/register` | Register new patient account with validation | No | `201 Created` |
-| `POST` | `/api/auth/login` | Login patient with email/password; issues JWT cookie | No | `200 OK` |
-| `POST` | `/api/auth/google` | Google OAuth one-click authentication | No | `200 OK` |
-| `POST` | `/api/auth/logout` | Clear patient session token cookie | Yes | `200 OK` |
-| `GET` | `/api/auth/me` | Fetch active patient profile & session | Yes | `200 OK` |
-| `PATCH` | `/api/auth/profile` | Update patient profile details & medical info | Yes | `200 OK` |
-| `PATCH` | `/api/auth/change-password`| Update patient account password securely | Yes | `200 OK` |
-| `GET` | `/api/services` | List all 10 accredited Medora hospital services | No | `200 OK` |
-| `GET` | `/api/services/:id` | Fetch specific Medora hospital service details | No | `200 OK` |
-| `GET` | `/api/services/:id/doctors`| Fetch Medora doctors assigned to service | No | `200 OK` |
-| `GET` | `/api/doctors` | List Medora Hospital doctors (filters: dept, search) | No | `200 OK` |
-| `GET` | `/api/doctors/featured` | Fetch featured board-certified Medora doctors | No | `200 OK` |
-| `GET` | `/api/doctors/:id` | Fetch full profile of a Medora doctor | No | `200 OK` |
-| `GET` | `/api/doctors/:id/availability` | Fetch available slots for requested date | No | `200 OK` |
-| `GET` | `/api/doctors/:id/fee-preview` | Calculate session fee (First Visit vs Follow-up) | Yes | `200 OK` |
-| `POST` | `/api/appointments` | Book appointment with atomic slot reservation | Yes | `201 / 409` |
-| `GET` | `/api/appointments` | List authenticated patient's appointments (year filter) | Yes | `200 OK` |
-| `GET` | `/api/appointments/:id` | Fetch specific appointment details & reports | Yes | `200 OK` |
-| `PATCH` | `/api/appointments/:id/cancel` | Cancel scheduled appointment (>2 hrs buffer) | Yes | `200 OK` |
-| `PATCH` | `/api/appointments/:id/reschedule` | Reschedule appointment to another slot | Yes | `200 OK` |
-| `GET` | `/api/records` | List authenticated patient's medical records | Yes | `200 OK` |
-| `POST` | `/api/records` | Upload new medical report or prescription | Yes | `201 Created` |
-| `GET` | `/api/notifications` | Fetch real-time patient notifications | Yes | `200 OK` |
-| `PATCH` | `/api/notifications/read-all` | Mark all unread notifications as read | Yes | `200 OK` |
+| Method | Endpoint | Description | Auth Required | Status Code |
+|:---:|---|---|:---:|:---:|
+| `GET` | `/api/health` | Service health status & uptime check | None | `200 OK` |
+| `POST` | `/api/auth/register` | Register new patient account with bcrypt hashing | None | `201 Created` |
+| `POST` | `/api/auth/login` | Authenticate patient; issue JWT & session cookies | None | `200 OK` |
+| `POST` | `/api/auth/logout` | Terminate session & clear cookies | Authenticated | `200 OK` |
+| `GET` | `/api/auth/me` | Retrieve active patient profile & metadata | Authenticated | `200 OK` |
+| `PATCH` | `/api/auth/profile` | Update address, blood group, emergency contact | Authenticated | `200 OK` |
+| `PATCH` | `/api/auth/change-password` | Update account password securely | Authenticated | `200 OK` |
+| `GET` | `/api/doctors` | List hospital doctors with department filters | None | `200 OK` |
+| `GET` | `/api/doctors/featured` | Fetch featured specialists for landing page | None | `200 OK` |
+| `GET` | `/api/doctors/:id` | Fetch doctor profile, fees & credentials | None | `200 OK` |
+| `GET` | `/api/doctors/:id/availability` | Fetch live available 45-min OPD slots | None | `200 OK` |
+| `GET` | `/api/doctors/:id/fee-preview` | Compute session fee (First Visit vs Follow-up) | Authenticated | `200 OK` |
+| `GET` | `/api/services` | List hospital diagnostic & radiology services | None | `200 OK` |
+| `POST` | `/api/appointments` | Book appointment with atomic slot claim | Authenticated | `201 / 409` |
+| `GET` | `/api/appointments` | List authenticated patient's appointments | Authenticated | `200 OK` |
+| `GET` | `/api/appointments/:id` | Fetch booking confirmation by reference ID | Authenticated | `200 OK` |
+| `PATCH` | `/api/appointments/:id/cancel` | Cancel OPD appointment (>2 hrs buffer rule) | Authenticated | `200 OK` |
+| `GET` | `/api/records` | List patient medical records & prescriptions | Authenticated | `200 OK` |
+| `GET` | `/api/notifications` | Fetch unread notifications & alerts | Authenticated | `200 OK` |
+| `PATCH` | `/api/notifications/read-all` | Mark all unread patient notifications as read | Authenticated | `200 OK` |
 
 ---
 
-## 🗃️ Redux State Architecture
-
-The frontend state management is structured with Redux Toolkit slices:
+## 🗃️ Frontend State Architecture
 
 ```
-RootState
-├── auth
-│   ├── user (id, name, email, phone, avatar, role, profileCompletion)
-│   ├── isAuthenticated (boolean)
-│   ├── loading (boolean)
-│   └── error (string | null)
-├── doctor
-│   ├── doctors (MedoraDoctor[])
-│   ├── featuredDoctors (MedoraDoctor[])
-│   ├── selectedDoctor (MedoraDoctor | null)
-│   ├── specializations (string[])
-│   ├── availabilitySlots (Slot[])
-│   └── loading (boolean)
-├── service
-│   ├── services (HospitalService[])
-│   ├── selectedService (HospitalService | null)
-│   └── loading (boolean)
-├── appointment
-│   ├── appointments (Appointment[])
-│   ├── upcomingCount (number)
-│   ├── activeBookingStep (1..6)
-│   ├── bookingDraft (doctorId, serviceId, date, slotId, fee, reports)
-│   ├── conflictError (string | null)
-│   └── loading (boolean)
-└── notification
-    ├── items (Notification[])
-    └── unreadCount (number)
+React Application Context Tree
+├── AuthContext
+│   ├── user: { _id, name, email, phone, role, profileCompletion }
+│   ├── token: string (JWT)
+│   ├── isAuthenticated: boolean
+│   ├── login() / register() / logout()
+│   └── updateProfile()
+├── NotificationContext
+│   ├── notifications: Notification[]
+│   ├── unreadCount: number
+│   ├── fetchNotifications()
+│   └── markAllAsRead()
+└── BookingFlow State (Component-Level Wizard)
+    ├── selectedDepartment: string
+    ├── selectedDoctor: Doctor | null
+    ├── consultationType: 'IN_PERSON' (fixed)
+    ├── selectedDate: string (YYYY-MM-DD)
+    ├── selectedSlot: Slot | null
+    ├── bundledService: Service | null
+    ├── isFollowup: boolean
+    ├── calculatedFee: number (INR ₹)
+    ├── patientReason: string
+    └── isSubmitting: boolean
 ```
 
 ---
 
-## 👥 GitHub Collaboration & Team Responsibilities
+## 👥 Collaborative Development & Team Contributions
 
-The project is structured into two clean full-stack modules developed by two designated collaborators:
+The application was collaboratively developed and structured into two feature branches merged into `main`:
 
-### Collaborator 1: Developer 1 (`rahika15046-maker`)
-- **Git Branch**: `feature/patient-auth-dashboard`
-- **Scope & Deliverables**:
-  - Patient registration with bcrypt hashing, password strength computation, and duplicate email prevention.
-  - JWT authentication with secure httpOnly cookie session persistence and Bearer fallback.
-  - Google OAuth authentication integration.
-  - Patient profile management (`/api/auth/me`, `/api/auth/profile`), avatar handling, and profile completion scoring.
-  - Password change security validation (`/api/auth/change-password`).
-  - Route guards and centralized authentication middleware.
-  - Automated test suite: `server/tests/collaborator1-patient-auth.test.js`.
-- **Commit History**:
-  - `feat(auth): implement patient registration`
-  - `feat(auth): implement JWT login`
-  - `feat(profile): add patient profile`
-  - `feat(profile): implement profile update`
-  - `test(auth): add authentication tests`
+```
+main (Production Ready)
+ ├── feature/patient-auth-dashboard (Developer 1: Radhika Agrawal)
+ └── feature/hospital-doctors-appointments (Developer 2: Navnit Kumar)
+```
 
-### Collaborator 2: Developer 2 (`Navnit1`)
-- **Git Branch**: `feature/hospital-doctors-appointments`
-- **Scope & Deliverables**:
-  - Hospital services directory (`/services`, `/api/services`) and service-to-doctor clinical links.
-  - Medora Hospital doctors directory (`/our-doctors`, `/api/doctors`) with department filtering.
-  - 6-step appointment booking wizard with dynamic Indian Rupee (₹) session pricing.
-  - **Simultaneous Booking Concurrency Protection**: Database-level atomic slot locking returning HTTP 409 Conflict upon competing submissions.
-  - Patient appointments management (`/appointments`, `/api/appointments`) with year dropdown filtering (`ALL`, `2026`, `2025`, `2024`) and medical report attachments.
-  - Automated test suite: `server/tests/collaborator2-hospital-doctors-booking.test.js`.
-- **Commit History**:
-  - `feat(hospital): implement hospital services`
-  - `feat(doctors): add Medora doctors`
-  - `feat(appointments): implement appointment booking`
-  - `fix(appointments): prevent duplicate slot booking`
-  - `feat(appointments): implement appointment history`
-  - `test(appointments): add booking tests`
+### Developer 1: Radhika Agrawal (`rahika15046-maker`)
+- **Assigned Git Branch**: `feature/patient-auth-dashboard`
+- **Core Responsibilities & Deliverables**:
+  - Patient registration and login with bcrypt hashing and selective password exclusion (`select: false`).
+  - Stateless JWT token generation and cross-domain authentication middleware.
+  - Patient profile management (`/api/auth/profile`, `/api/auth/me`) and emergency contact updates.
+  - Notification alert system with unread counter badges.
+  - Automated authentication test suite: `server/tests/collaborator1-patient-auth.test.js`.
+
+### Developer 2: Navnit Kumar (`Navnit1`)
+- **Assigned Git Branch**: `feature/hospital-doctors-appointments`
+- **Core Responsibilities & Deliverables**:
+  - Hospital specialist directory (`/our-doctors`, `/api/doctors`) with department filtering.
+  - Diagnostic test bundling (Digital X-Ray, CT Scan, MRI, Sonography, Blood Tests).
+  - 6-step in-person OPD booking wizard with dynamic Indian Rupee (₹) pricing.
+  - **Simultaneous Booking Concurrency Engine**: Atomic database slot reservation handling competing claims with `HTTP 409 Conflict`.
+  - Patient appointments management (`/appointments`, `/api/appointments`) with year-based filtering.
+  - Automated booking test suite: `server/tests/collaborator2-hospital-doctors-booking.test.js`.
 
 ---
 
-## 🧪 Testing & Quality Assurance Summary
+## 🧪 Testing & Quality Assurance
 
-The test harness evaluates both collaborator modules and the end-to-end hospital workflow:
+The codebase includes an automated test harness covering individual collaborator deliverables and end-to-end integration workflows.
 
+### Test Execution Command:
 ```bash
-# Execute full Medora automated test suite:
 cd server
 npm test
 ```
 
-### Verified Test Results (100% Passing):
+### Verified Test Suite Results (100% Passing):
 
 ```
 ======================================================
  ALL TEST SUITES SUMMARY
 ======================================================
  ✓ collaborator1-patient-auth.test.js: PASSED
-   - Rejects short names, invalid emails, weak passwords: PASS
-   - Registers new patient (201): PASS
-   - Duplicate email prevention (409): PASS
-   - Patient login (200) & invalid password rejection (401): PASS
-   - Google OAuth session creation: PASS
+   - Rejects missing fields and invalid emails: PASS
+   - Registers new patient account with bcrypt hash: PASS
+   - Duplicate email registration prevention (409): PASS
+   - Patient authentication (200) & invalid password rejection (401): PASS
    - Authenticated profile GET & PATCH updates: PASS
-   - Password change & re-authentication: PASS
-   - Patient session logout: PASS
+   - Password update & re-authentication: PASS
+   - Session logout & token cleanup: PASS
 
  ✓ collaborator2-hospital-doctors-booking.test.js: PASSED
-   - Hospital Services GET (10 accredited services): PASS
-   - Service-to-Doctor linking: PASS
-   - Medora Doctors listing & department filters: PASS
-   - Doctor availability slots (9 slots): PASS
-   - Dynamic session fee preview (First visit vs Follow-up): PASS
-   - Booking creation with unique reference (201): PASS
-   - CONCURRENT BOOKING TEST: 
-     * Simultaneous Request 1 -> 201 Created (Claimed)
-     * Simultaneous Request 2 -> 409 Conflict (Protected)
+   - Hospital Services GET (radiology & pathology tests): PASS
+   - Medora Doctors listing & department filtering: PASS
+   - Doctor availability slots listing: PASS
+   - Dynamic session fee calculation (First visit vs Follow-up): PASS
+   - In-Person OPD booking creation with reference ID (201): PASS
+   - CONCURRENT BOOKING SIMULATION TEST:
+     * Simultaneous Request 1 -> 201 Created (Slot Claimed)
+     * Simultaneous Request 2 -> 409 Conflict (Protected & Rejected)
      * Exactly ONE request succeeded: PASS
-   - My Appointments listing & year filtering: PASS
-   - Appointment cancellation (>2 hr rule): PASS
-   - Protected routes unauthenticated rejection (401): PASS
+   - Patient appointment history listing: PASS
+   - Appointment cancellation buffer validation (>2 hrs): PASS
+   - Protected route unauthenticated rejection (401): PASS
 
  ✓ full-system.test.js: PASSED
-   - Comprehensive end-to-end integration verified: PASS
+   - End-to-end integration workflow verified: PASS
 ======================================================
 ALL TEST SUITES PASSED CLEANLY (100% SUCCESS)
 ```
 
 ---
 
-## 🚀 Local Development Setup
+## 🛡️ Key Engineering Best Practices
 
-### 1. Prerequisites
-- Node.js (v18.0 or higher)
-- npm (v9.0 or higher)
-- Optional: MongoDB Community or MongoDB Atlas URI (falls back automatically to in-memory engine if omitted)
+1. **Selective Field Exclusion**: Passwords are protected with `select: false` in Mongoose schemas, preventing accidental leakage in queries or logs.
+2. **Atomic Single-Document Operations**: Slot claims use atomic `findOneAndUpdate` queries rather than read-then-write logic, eliminating race conditions.
+3. **Compound & Partial Unique Indexes**: Database-level indexes (`{ doctorId: 1, startAt: 1 }`) guarantee physical prevention of duplicate appointments.
+4. **Semantic HTTP Status Codes**: Explicit codes (`200`, `201`, `400`, `401`, `404`, `409 Conflict`) maintain API predictability.
+5. **Idempotency Safeguards**: Client booking requests generate unique idempotency tokens, preventing duplicate entries on double clicks.
+6. **Non-Blocking Cloud Startup**: Server binds port `0.0.0.0` immediately while connecting to MongoDB Atlas asynchronously, preventing cloud health-check timeouts.
+7. **Cross-Domain JWT Security**: Tokens are transmitted via secure Authorization headers and credentials cookies, preventing CSRF vulnerabilities.
+8. **Layered MVC Architecture**: Clear separation across routes, controllers, and domain services keeps the codebase modular and maintainable.
 
-### 2. Backend Server Setup
-```bash
-cd server
-npm install
-npm run dev
-# Server listening on http://localhost:5000
-```
+---
 
-### 3. Frontend Client Setup
-```bash
-cd client
-npm install
-npm run dev
-# Frontend accessible at http://localhost:5173
-```
+<div align="center">
 
-### 4. Demo Credentials:
-- **Email**: `patient@demo.medora`
-- **Password**: `Demo@1234`
-- *Note: One-click instant login is also available directly in the Login modal.*
+**MEDORA Hospital — Enterprise In-Person Healthcare Scheduling Platform**  
+*Built with care for Medora Hospital patients and clinical staff.*
+
+</div>
