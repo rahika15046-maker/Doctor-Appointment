@@ -165,7 +165,18 @@ export default function BookingFlow({
       setLoadingSlots(true);
       api.getDoctorAvailability(docId, selectedDate)
         .then((res) => {
-          const slots = res.data || [];
+          let slots = res.data || [];
+          if (!slots.length) {
+            slots = [9, 10, 11, 12, 14, 15, 16, 17].map((h) => {
+              const startAt = new Date(`${selectedDate}T${String(h).padStart(2, '0')}:00:00+05:30`);
+              return {
+                _id: `${docId}-${selectedDate}-${h}`,
+                startAt,
+                endAt: new Date(startAt.getTime() + 45 * 60e3),
+                status: 'AVAILABLE',
+              };
+            });
+          }
           setAvailableSlots(slots);
           const firstAvail = slots.find(s => s.status === 'AVAILABLE');
           if (firstAvail) setSelectedSlot(firstAvail);
@@ -174,7 +185,7 @@ export default function BookingFlow({
           const fallback = [9, 10, 11, 12, 14, 15, 16, 17].map((h) => {
             const startAt = new Date(`${selectedDate}T${String(h).padStart(2, '0')}:00:00+05:30`);
             return {
-              _id: `slot-${h}`,
+              _id: `${docId}-${selectedDate}-${h}`,
               startAt,
               endAt: new Date(startAt.getTime() + 45 * 60e3),
               status: 'AVAILABLE',
@@ -812,7 +823,7 @@ export default function BookingFlow({
                   Step 4: Select Appointment Date & Time
                 </h3>
                 <p style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: 20 }}>
-                  Choose your preferred clinical appointment slot. Real-time atomic reservation guarantees no double bookings.
+                  Choose a convenient date and time for your consultation at Medora Hospital.
                 </p>
 
                 {/* 14-Day Horizontal Calendar Ribbon */}
@@ -1056,7 +1067,7 @@ export default function BookingFlow({
                   Step 6: Review & Lock Appointment
                 </h3>
                 <p style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: 20 }}>
-                  Please verify your clinical booking summary before atomic database reservation
+                  Please review your appointment summary before confirming your booking.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 24 }}>

@@ -85,31 +85,13 @@ export default function AuthModal({ initialMode = 'login', isOpen, onClose, onAu
     }
   };
 
-  const handleDemoPatientLogin = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      const res = await api.login({
-        email: 'patient@demo.medora',
-        password: 'Demo@1234',
-      });
-      onAuthSuccess(res.data);
-      onClose();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleGoogleLogin = async () => {
     setError('');
     setLoading(true);
     try {
       const res = await api.googleLogin({
-        email: form.email || 'patient.google@medora.health',
-        name: form.name || 'Priya Sharma',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300',
+        email: form.email || undefined,
+        name: form.name || undefined,
       });
       onAuthSuccess(res.data);
       onClose();
@@ -180,31 +162,6 @@ export default function AuthModal({ initialMode = 'login', isOpen, onClose, onAu
           </div>
         )}
 
-        {/* Demo Fast Login Pills */}
-        <div style={{
-          backgroundColor: '#F0FDFA',
-          border: '1px solid #CCFBF1',
-          borderRadius: 12,
-          padding: '10px 14px',
-          marginBottom: 20,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-          <div>
-            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0F766E' }}>One-Click Demo</div>
-            <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Priya Sharma (Patient)</div>
-          </div>
-          <button
-            type="button"
-            onClick={handleDemoPatientLogin}
-            className="btn btn-primary btn-sm"
-            style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-          >
-            Instant Login
-          </button>
-        </div>
-
         {/* Main Form */}
         <form onSubmit={handleSubmit}>
           {mode === 'register' && (
@@ -216,7 +173,7 @@ export default function AuthModal({ initialMode = 'login', isOpen, onClose, onAu
                 </span>
                 <input
                   type="text"
-                  placeholder="e.g. Priya Sharma"
+                  placeholder="e.g. Radhika Sharma"
                   className="form-input"
                   style={{ paddingLeft: 42 }}
                   value={form.name}
@@ -399,27 +356,6 @@ export default function AuthModal({ initialMode = 'login', isOpen, onClose, onAu
               <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z" />
             </svg>
             <span>Continue with Google</span>
-          </button>
-
-          {/* Quick Demo Login Option */}
-          <button
-            type="button"
-            onClick={handleDemoPatientLogin}
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '9px 12px',
-              backgroundColor: '#F0FDFA',
-              border: '1px solid #CCFBF1',
-              borderRadius: 10,
-              color: '#0F766E',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              marginBottom: 18,
-            }}
-          >
-            ⚡ Quick Demo Patient Login (Priya Sharma)
           </button>
 
           {/* Toggle Login / Register */}

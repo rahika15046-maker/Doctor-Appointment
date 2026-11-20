@@ -28,8 +28,8 @@ export default function Dashboard({
   onLogout,
 }) {
   const [statsData, setStatsData] = useState({
-    stats: { upcoming: 1, total: 5, completed: 3, cancelled: 1 },
-    profileCompletion: 80,
+    stats: { upcoming: 0, total: 0, completed: 0, cancelled: 0 },
+    profileCompletion: 70,
     upcomingAppointment: null,
     recentActivities: [],
   });
@@ -95,8 +95,8 @@ export default function Dashboard({
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         }}>
           <img
-            src={user?.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300'}
-            alt="Priya Sharma"
+            src={user?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=300'}
+            alt={user?.name || 'Patient'}
             style={{
               width: 48,
               height: 48,
@@ -107,7 +107,7 @@ export default function Dashboard({
           />
           <div>
             <h4 style={{ fontSize: '0.96rem', fontWeight: 700, color: '#FFFFFF', marginBottom: 2 }}>
-              {user?.name || 'Priya Sharma'}
+              {user?.name || 'Patient'}
             </h4>
             <span style={{
               fontSize: '0.75rem',
@@ -305,7 +305,7 @@ export default function Dashboard({
           }}>
             <div>
               <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>
-                Welcome back, {user?.name ? user.name.split(' ')[0] : 'Priya'}! 👋
+                Welcome back, {user?.name ? user.name.split(' ')[0] : 'Patient'}! 👋
               </h1>
               <p style={{ fontSize: '0.92rem', color: '#64748B' }}>
                 Your health journey matters to us. Keep track of appointments and medical updates.

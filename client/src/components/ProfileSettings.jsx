@@ -6,14 +6,14 @@ export default function ProfileSettings({ user, onProfileUpdated }) {
   const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
-    name: user?.name || 'Priya Sharma',
-    email: user?.email || 'patient@demo.medora',
-    phone: user?.phone || '+91 98765 43210',
-    bloodGroup: user?.bloodGroup || 'O+',
-    dateOfBirth: user?.dateOfBirth || '1992-05-14',
-    gender: user?.gender || 'Female',
-    emergencyContact: user?.emergencyContact || '+91 98765 00000 (Rahul Sharma - Spouse)',
-    address: user?.address || '42 Health Street, Saket, New Delhi',
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    bloodGroup: user?.bloodGroup || '',
+    dateOfBirth: user?.dateOfBirth || '',
+    gender: user?.gender || '',
+    emergencyContact: user?.emergencyContact || '',
+    address: user?.address || '',
   });
 
   // Password state
@@ -203,10 +203,10 @@ export default function ProfileSettings({ user, onProfileUpdated }) {
             </div>
             <div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', marginBottom: 2 }}>
-                {user?.name || 'Priya Sharma'}
+                {user?.name || 'Patient'}
               </h3>
               <p style={{ fontSize: '0.85rem', color: '#64748B', marginBottom: 6 }}>
-                Patient ID: <b style={{ color: '#0D9488' }}>MED-P-88210</b> • Medora Hospital Registered
+                Patient ID: <b style={{ color: '#0D9488' }}>MED-P-{String(user?._id || user?.id || '001').slice(-5).toUpperCase()}</b> • Medora Hospital Registered
               </p>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <span className="badge badge-confirmed">Verified Patient</span>

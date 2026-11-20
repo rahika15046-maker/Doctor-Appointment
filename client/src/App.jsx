@@ -31,7 +31,7 @@ export default function App() {
   const [featuredDoctors, setFeaturedDoctors] = useState([]);
   const [allDoctors, setAllDoctors] = useState([]);
   const [specializations, setSpecializations] = useState([]);
-  const [unreadNotifications, setUnreadNotifications] = useState(2);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   // Modals state
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -74,8 +74,8 @@ export default function App() {
 
     // Check notifications
     api.getNotifications()
-      .then((res) => setUnreadNotifications(res.unreadCount ?? 2))
-      .catch(() => {});
+      .then((res) => setUnreadNotifications(res.unreadCount || 0))
+      .catch(() => setUnreadNotifications(0));
   }, []);
 
   const handleLogout = async () => {
