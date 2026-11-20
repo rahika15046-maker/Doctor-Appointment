@@ -417,19 +417,34 @@ r.post('/appointments/upload-report', requireAuth, uploadReport.single('report')
 
 // Appointments
 r.post('/appointments', requireAuth, requireRole('patient'), wrap(async (req, res) => {
-  const { doctorId, slotId, serviceId, serviceName, consultationType, reason, additionalComments, medicalReports } = req.body;
-  const cType = consultationType || req.body.type || 'IN_PERSON';
-  if (!doctorId || !slotId || !['IN_PERSON', 'ONLINE'].includes(cType) || !reason) {
-    throw new ApiError(400, 'Missing or invalid fields');
+  const {
+    doctorId,
+    slotId,
+    serviceId,
+    serviceName,
+    consultationType,
+    reason,
+    additionalComments,
+    medicalReports,
+    paymentMethod,
+    paymentId,
+    razorpayOrderId,
+  } = req.body;
+  // Medora Hospital consultations are exclusively In-Person OPD visits
+  const cType = 'IN_PERSON';
+  if (!doctorId || !slotId || !reason) {
+    throw new ApiError(400, 'Missing or invalid fields: doctorId, slotId, and reason are required');
   }
   
+  let pMethod = paymentMethod;
+  if (!pMethod || !['PAY_ON_VISIT', 'RAZORPAY'].includes(pMethod)) {
+    pMethod = 'PAY_ON_VISIT';
+  }
+  const pStatus = pMethod === 'RAZORPAY' ? 'PAID' : 'PAY_ON_VISIT';
+
   const d = await Doctor.findOne({ _id: doctorId, verificationStatus: 'VERIFIED' }) || await Doctor.findById(doctorId);
   if (!d) {
     throw new ApiError(404, 'Doctor not found or unverified');
-  }
-  const allowedTypes = (d.consultationTypes && d.consultationTypes.length > 0) ? d.consultationTypes : ['IN_PERSON', 'ONLINE'];
-  if (!allowedTypes.includes(cType)) {
-    throw new ApiError(400, 'Doctor or consultation type unavailable');
   }
 
   // Check if patient has visited this doctor before for follow-up pricing
@@ -458,18 +473,62 @@ r.post('/appointments', requireAuth, requireRole('patient'), wrap(async (req, re
     consultationFee: finalFee,
     isFollowup,
     idempotencyKey: req.get('Idempotency-Key'),
+    paymentMethod: pMethod,
+    paymentStatus: pStatus,
+    paymentId: paymentId || (pMethod === 'RAZORPAY' ? `pay_${crypto.randomBytes(6).toString('hex')}` : undefined),
+    razorpayOrderId,
   });
 
   // Create patient notification
   await Notification.create({
     patientId,
     title: 'Appointment Booked Successfully',
-    message: `Appointment ${appointment.referenceId} confirmed with ${d.name} at Medora Hospital (${isFollowup ? 'Follow-up' : 'First Visit'} - ₹${finalFee}).`,
+    message: `Appointment ${appointment.referenceId} confirmed with ${d.name} at Medora Hospital (${isFollowup ? 'Follow-up' : 'First Visit'} - ₹${finalFee}, Payment: ${pMethod === 'RAZORPAY' ? 'Paid via Razorpay' : 'Pay on Visit'}).`,
     type: 'appointment',
     isRead: false,
   }).catch(() => {});
 
   res.status(replayed ? 200 : 201).json({ success: true, data: appointment, message: 'Appointment booked successfully' });
+}));
+
+// Razorpay Payment Routes
+r.post('/payments/razorpay/order', requireAuth, wrap(async (req, res) => {
+  const { amount } = req.body;
+  if (!amount || Number(amount) <= 0) throw new ApiError(400, 'Valid amount required');
+  
+  const keyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_MedoraHospitalDemo';
+  const orderId = `order_${crypto.randomBytes(10).toString('hex')}`;
+  
+  res.json({
+    success: true,
+    data: {
+      orderId,
+      amount: Math.round(Number(amount) * 100), // in paise
+      currency: 'INR',
+      keyId,
+    }
+  });
+}));
+
+r.post('/payments/razorpay/verify', requireAuth, wrap(async (req, res) => {
+  const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
+  if (!razorpayPaymentId) {
+    throw new ApiError(400, 'Payment ID required');
+  }
+  if (process.env.RAZORPAY_KEY_SECRET && razorpaySignature && razorpayOrderId) {
+    const expected = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+      .digest('hex');
+    if (expected !== razorpaySignature) {
+      throw new ApiError(400, 'Payment signature verification failed');
+    }
+  }
+  res.json({
+    success: true,
+    verified: true,
+    paymentId: razorpayPaymentId,
+    message: 'Payment verified successfully'
+  });
 }));
 
 r.get('/appointments', requireAuth, wrap(async (req, res) => {

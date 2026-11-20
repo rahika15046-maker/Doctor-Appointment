@@ -23,10 +23,18 @@ async function runTxn(fn) {
   } catch (e) {
     // If standalone MongoDB does not support transactions, fall back to atomic non-transactional execution
     if (e.message && (e.message.includes('replica set') || e.message.includes('Transaction numbers'))) {
-      return await fn(null);
+      try {
+        return await fn(null);
+      } catch (err2) {
+        if (err2 instanceof ApiError) throw err2;
+        if (err2.code === 11000 || err2.code === 112 || err2.message?.includes('E11000') || err2.hasErrorLabel?.('TransientTransactionError')) {
+          throw new ApiError(409, CONFLICT_MSG);
+        }
+        throw err2;
+      }
     }
     if (e instanceof ApiError) throw e;
-    if (e.code === 11000 || e.code === 112 || e.hasErrorLabel?.('TransientTransactionError')) throw new ApiError(409, CONFLICT_MSG);
+    if (e.code === 11000 || e.code === 112 || e.message?.includes('E11000') || e.hasErrorLabel?.('TransientTransactionError')) throw new ApiError(409, CONFLICT_MSG);
     throw e;
   } finally {
     if (session) await session.endSession().catch(() => {});
@@ -52,7 +60,10 @@ const claimSlot = async (slotId, doctorId, session) => {
           isBlocked: false,
         });
         slotId = existing._id;
-      } catch (_e) {}
+      } catch (_e) {
+        existing = await AppointmentSlot.findOne({ doctorId, startAt: s });
+        if (existing) slotId = existing._id;
+      }
     }
   }
   const filter = { _id: existing?._id || slotId, doctorId, status: 'AVAILABLE' };
@@ -62,7 +73,24 @@ const claimSlot = async (slotId, doctorId, session) => {
   return await AppointmentSlot.findOneAndUpdate(filter, update, opts);
 };
 
-export async function bookAppointment({ patientId, doctorId, serviceId, serviceName, slotId, consultationType, reason, additionalComments, medicalReports = [], consultationFee, isFollowup = false, idempotencyKey }) {
+export async function bookAppointment({
+  patientId,
+  doctorId,
+  serviceId,
+  serviceName,
+  slotId,
+  consultationType,
+  reason,
+  additionalComments,
+  medicalReports = [],
+  consultationFee,
+  isFollowup = false,
+  idempotencyKey,
+  paymentMethod = 'PAY_ON_VISIT',
+  paymentStatus = 'PENDING',
+  paymentId,
+  razorpayOrderId,
+}) {
   if (idempotencyKey) {
     const prev = await Appointment.findOne({ patientId, idempotencyKey });
     if (prev) return { appointment: prev, replayed: true };
@@ -89,6 +117,10 @@ export async function bookAppointment({ patientId, doctorId, serviceId, serviceN
         currency: 'INR',
         idempotencyKey,
         status: 'CONFIRMED',
+        paymentMethod,
+        paymentStatus,
+        paymentId,
+        razorpayOrderId,
         referenceId: ref(),
       };
 
@@ -111,6 +143,9 @@ export async function bookAppointment({ patientId, doctorId, serviceId, serviceN
     });
     return { appointment, replayed: false };
   } catch (e) {
+    if (e.code === 11000 || e.code === 112 || e.message?.includes('E11000') || e.message?.includes('duplicate key') || e.hasErrorLabel?.('TransientTransactionError')) {
+      throw new ApiError(409, CONFLICT_MSG);
+    }
     if (idempotencyKey) {
       const prev = await Appointment.findOne({ patientId, idempotencyKey });
       if (prev) return { appointment: prev, replayed: true };

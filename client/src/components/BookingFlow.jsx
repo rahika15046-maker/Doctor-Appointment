@@ -11,6 +11,7 @@ import {
   BadgeCheckIcon,
   SearchIcon,
   ShieldCheckIcon,
+  CreditCardIcon,
 } from './Icons';
 import {
   Hospital3DIcon,
@@ -59,8 +60,15 @@ export default function BookingFlow({
   // Search in doctor selection
   const [doctorSearch, setDoctorSearch] = useState('');
 
-  // Consultation mode
-  const [consultationType, setConsultationType] = useState('IN_PERSON'); // 'IN_PERSON' | 'ONLINE'
+  // Consultation mode (Medora Hospital is exclusively In-Person OPD visits)
+  const consultationType = 'IN_PERSON';
+  
+  // Payment mode: 'PAY_ON_VISIT' (default) or 'RAZORPAY'
+  const [paymentMethod, setPaymentMethod] = useState('PAY_ON_VISIT');
+  const [razorpayModalOpen, setRazorpayModalOpen] = useState(false);
+  const [razorpayOrder, setRazorpayOrder] = useState(null);
+  const [simulatedUpiId, setSimulatedUpiId] = useState('');
+  const [selectedPayTab, setSelectedPayTab] = useState('upi'); // 'upi' | 'card' | 'netbanking'
   
   // Date selection (default tomorrow)
   const tomorrowStr = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
@@ -257,12 +265,14 @@ export default function BookingFlow({
     }
   };
 
-  const handleConfirmBooking = async () => {
+  const executeBooking = async (paymentDetails = {}) => {
     setError('');
     setSlotConflict(false);
     setSubmitting(true);
     const docId = selectedDoctor._id || selectedDoctor.id;
     const slotId = selectedSlot?._id || selectedSlot?.id;
+    const methodToUse = paymentDetails.paymentMethod || paymentMethod;
+    const statusToUse = paymentDetails.paymentStatus || (methodToUse === 'RAZORPAY' ? 'PAID' : 'PAY_ON_VISIT');
     try {
       const res = await api.bookAppointment({
         doctorId: docId,
@@ -273,12 +283,16 @@ export default function BookingFlow({
         reason: reason.trim(),
         additionalComments: additionalComments.trim(),
         medicalReports: medicalReports.map(r => r.url || r),
+        paymentMethod: methodToUse,
+        paymentStatus: statusToUse,
+        paymentId: paymentDetails.paymentId,
+        razorpayOrderId: paymentDetails.razorpayOrderId,
       });
       if (res.data) {
         onBookingSuccess(res.data, selectedDoctor);
       }
     } catch (err) {
-      const isConflict = err.status === 409 || err.message?.toLowerCase().includes('already') || err.message?.toLowerCase().includes('conflict');
+      const isConflict = err.status === 409 || err.message?.toLowerCase().includes('already') || err.message?.toLowerCase().includes('conflict') || err.message?.toLowerCase().includes('another patient') || err.message?.toLowerCase().includes('booked');
       if (isConflict) {
         setSlotConflict(true);
         setError('⚠️ This appointment slot was just booked by another patient. Please select an alternate time slot below.');
@@ -295,6 +309,82 @@ export default function BookingFlow({
       }
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleConfirmBooking = async () => {
+    if (paymentMethod === 'RAZORPAY') {
+      setSubmitting(true);
+      setError('');
+      try {
+        const orderRes = await api.createRazorpayOrder({ amount: totalEstimatedFee });
+        const orderData = orderRes?.data;
+        
+        // Attempt to load standard Razorpay SDK
+        const loadRzp = () => new Promise((resolve) => {
+          if (window.Razorpay) return resolve(true);
+          const s = document.createElement('script');
+          s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          s.onload = () => resolve(true);
+          s.onerror = () => resolve(false);
+          document.body.appendChild(s);
+        });
+
+        const loaded = await loadRzp();
+        if (loaded && window.Razorpay && orderData) {
+          const options = {
+            key: orderData.keyId,
+            amount: orderData.amount,
+            currency: 'INR',
+            name: 'MEDORA Hospital',
+            description: `${selectedDoctor.name} - In-Person Hospital OPD Consultation`,
+            order_id: orderData.orderId,
+            handler: async (resp) => {
+              try {
+                await api.verifyRazorpayPayment({
+                  razorpayOrderId: resp.razorpay_order_id,
+                  razorpayPaymentId: resp.razorpay_payment_id,
+                  razorpaySignature: resp.razorpay_signature,
+                });
+                await executeBooking({
+                  paymentMethod: 'RAZORPAY',
+                  paymentStatus: 'PAID',
+                  paymentId: resp.razorpay_payment_id,
+                  razorpayOrderId: resp.razorpay_order_id,
+                });
+              } catch (verErr) {
+                setError('Payment verification failed: ' + verErr.message);
+                setSubmitting(false);
+              }
+            },
+            prefill: {
+              name: 'Patient',
+              email: 'patient@medora.health',
+            },
+            theme: { color: '#0D9488' },
+            modal: {
+              ondismiss: () => {
+                setSubmitting(false);
+              }
+            }
+          };
+          const rzpInstance = new window.Razorpay(options);
+          rzpInstance.open();
+        } else {
+          // Open interactive simulated Razorpay modal if script blocked or testing
+          setRazorpayOrder(orderData || { orderId: `order_${Date.now()}`, amount: totalEstimatedFee * 100, keyId: 'rzp_test' });
+          setRazorpayModalOpen(true);
+          setSubmitting(false);
+        }
+      } catch (orderErr) {
+        // Fallback to simulated payment modal
+        setRazorpayOrder({ orderId: `order_${Date.now()}`, amount: totalEstimatedFee * 100, keyId: 'rzp_test' });
+        setRazorpayModalOpen(true);
+        setSubmitting(false);
+      }
+    } else {
+      // Pay on Visit (offline OPD)
+      await executeBooking({ paymentMethod: 'PAY_ON_VISIT', paymentStatus: 'PAY_ON_VISIT' });
     }
   };
 
@@ -744,72 +834,39 @@ export default function BookingFlow({
             {step === 3 && (
               <div>
                 <h3 style={{ fontSize: '1.28rem', fontWeight: 800, color: '#0F172A', marginBottom: 6 }}>
-                  Step 3: Select Consultation Mode
+                  Step 3: Consultation Mode
                 </h3>
                 <p style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: 24 }}>
-                  Choose how you would like to consult with {selectedDoctor.name} at Medora Hospital
+                  All consultations with Medora specialists are conducted in-person at our Saket campus.
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
-                  {/* IN_PERSON */}
+                <div style={{ maxWidth: 560 }}>
                   <div
-                    onClick={() => setConsultationType('IN_PERSON')}
                     style={{
-                      padding: '24px',
+                      padding: '26px',
                       borderRadius: 18,
-                      border: consultationType === 'IN_PERSON' ? '2.5px solid #0D9488' : '1.5px solid #E2E8F0',
-                      backgroundColor: consultationType === 'IN_PERSON' ? '#F0FDFA' : '#FFFFFF',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
+                      border: '2.5px solid #0D9488',
+                      backgroundColor: '#F0FDFA',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-                      <Hospital3DIcon size={44} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+                      <Hospital3DIcon size={48} />
                       <div>
-                        <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A' }}>
-                          In-Person Visit
+                        <h4 style={{ fontSize: '1.12rem', fontWeight: 800, color: '#0F172A', marginBottom: 2 }}>
+                          In-Person Hospital Visit
                         </h4>
-                        <span style={{ fontSize: '0.78rem', color: '#0D9488', fontWeight: 700 }}>
-                          Hospital OPD & Diagnostic Suite
+                        <span style={{ fontSize: '0.82rem', color: '#0D9488', fontWeight: 700 }}>
+                          Medora Hospital OPD & Diagnostic Suite — Saket Campus
                         </span>
                       </div>
                     </div>
-                    <p style={{ fontSize: '0.84rem', color: '#64748B', lineHeight: 1.5, marginBottom: 12 }}>
-                      Physical checkup, vitals examination, and direct access to on-site imaging and diagnostic suites at Medora Hospital.
+                    <p style={{ fontSize: '0.88rem', color: '#475569', lineHeight: 1.6, marginBottom: 16 }}>
+                      Physical checkup, vitals examination, and direct access to on-site imaging and diagnostic suites (X-Ray, CT Scan, MRI, Sonography, Blood Tests).
                     </p>
-                    <div style={{ fontSize: '0.76rem', color: '#0F766E', fontWeight: 700 }}>
-                      ✓ Recommended for imaging, X-Rays, and physical exams
-                    </div>
-                  </div>
-
-                  {/* ONLINE VIDEO */}
-                  <div
-                    onClick={() => setConsultationType('ONLINE')}
-                    style={{
-                      padding: '24px',
-                      borderRadius: 18,
-                      border: consultationType === 'ONLINE' ? '2.5px solid #0D9488' : '1.5px solid #E2E8F0',
-                      backgroundColor: consultationType === 'ONLINE' ? '#F0FDFA' : '#FFFFFF',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-                      <Video3DIcon size={44} />
-                      <div>
-                        <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A' }}>
-                          Encrypted Video Consultation
-                        </h4>
-                        <span style={{ fontSize: '0.78rem', color: '#0D9488', fontWeight: 700 }}>
-                          High-Definition Telemedicine
-                        </span>
-                      </div>
-                    </div>
-                    <p style={{ fontSize: '0.84rem', color: '#64748B', lineHeight: 1.5, marginBottom: 12 }}>
-                      Consult with Dr. {selectedDoctor.name.split(' ')[1] || selectedDoctor.name} over secure video with instant e-prescription download.
-                    </p>
-                    <div style={{ fontSize: '0.76rem', color: '#0F766E', fontWeight: 700 }}>
-                      ✓ Zero commute time, join from any device
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.82rem', color: '#0F766E', fontWeight: 600 }}>
+                      <div>✓ Doctor Consultation at Medora Saket Campus, New Delhi</div>
+                      <div>✓ Complete Clinical Vitals & Physical Examination</div>
+                      <div>✓ Priority OPD Counter Access & Same-Day Reports</div>
                     </div>
                   </div>
                 </div>
@@ -1135,7 +1192,7 @@ export default function BookingFlow({
                     <div>
                       <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 600 }}>CONSULTATION MODE</div>
                       <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#0F172A' }}>
-                        {consultationType === 'IN_PERSON' ? 'In-Person Hospital Visit' : 'Encrypted Video Consultation'}
+                        In-Person Hospital Visit
                       </div>
                       <div style={{ fontSize: '0.8rem', color: '#64748B' }}>Medora Hospital, Saket Campus</div>
                     </div>

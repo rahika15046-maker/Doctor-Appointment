@@ -21,7 +21,7 @@ export default function OurDoctors({
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState(initialDepartment);
-  const [selectedConsultationType, setSelectedConsultationType] = useState('ALL');
+  const selectedConsultationType = 'IN_PERSON';
 
   useEffect(() => {
     setSelectedDepartment(initialDepartment);
@@ -133,26 +133,23 @@ export default function OurDoctors({
             />
           </div>
 
-          {/* Consultation Type Filter */}
-          <select
-            value={selectedConsultationType}
-            onChange={(e) => setSelectedConsultationType(e.target.value)}
-            style={{
-              padding: '11px 16px',
-              borderRadius: 12,
-              border: '1px solid #CBD5E1',
-              backgroundColor: '#FFFFFF',
-              fontSize: '0.88rem',
-              fontWeight: 600,
-              color: '#334155',
-              outline: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            <option value="ALL">All Consultation Types</option>
-            <option value="IN_PERSON">In-Person at Hospital</option>
-            <option value="ONLINE">Online Video Consultation</option>
-          </select>
+          {/* Consultation Type Badge */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '11px 16px',
+            backgroundColor: '#F0FDFA',
+            border: '1px solid #CCFBF1',
+            borderRadius: 12,
+            fontSize: '0.86rem',
+            fontWeight: 700,
+            color: '#0F766E',
+            whiteSpace: 'nowrap',
+          }}>
+            <HospitalIcon size={16} />
+            <span>In-Person OPD Only</span>
+          </div>
 
           <button type="submit" className="btn btn-primary" style={{ padding: '11px 24px' }}>
             Search Doctors
@@ -350,16 +347,9 @@ export default function OurDoctors({
                   </div>
 
                   <div style={{ display: 'flex', gap: 10, fontSize: '0.75rem', color: '#64748B', fontWeight: 600 }}>
-                    {doc.consultationTypes?.includes('IN_PERSON') && (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <HospitalIcon size={13} style={{ color: '#0D9488' }} /> Hospital
-                      </span>
-                    )}
-                    {doc.consultationTypes?.includes('ONLINE') && (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <VideoIcon size={13} style={{ color: '#0D9488' }} /> Online Video
-                      </span>
-                    )}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <HospitalIcon size={13} style={{ color: '#0D9488' }} /> In-Person OPD
+                    </span>
                   </div>
                 </div>
               </div>
