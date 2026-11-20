@@ -393,11 +393,11 @@ export default function BookingFlow({
       )}
 
       {/* Main Container Card */}
-      <div className="card-3d" style={{ padding: '32px' }}>
+      <div className="card-3d" style={{ padding: '32px', maxWidth: '100%', overflowX: 'hidden' }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: selectedDoctor && step > 1 ? '290px 1fr' : '1fr',
-          gap: 36,
+          gridTemplateColumns: selectedDoctor && step > 1 ? 'minmax(250px, 280px) minmax(0, 1fr)' : '1fr',
+          gap: 32,
           alignItems: 'start',
         }}>
           {/* Left Preview: Selected Doctor & Service Summary (shows on steps 2-6) */}
@@ -514,7 +514,7 @@ export default function BookingFlow({
           )}
 
           {/* Right Area: Stepper Forms */}
-          <div>
+          <div style={{ minWidth: 0, width: '100%' }}>
             {/* STEP 1: Select Doctor Concern */}
             {step === 1 && (
               <div>
@@ -939,6 +939,53 @@ export default function BookingFlow({
                       })}
                     </div>
                   )}
+
+                  {/* Immediate proceed button right after slot is chosen */}
+                  {selectedSlot && (
+                    <div style={{
+                      marginTop: 20,
+                      padding: '14px 18px',
+                      backgroundColor: '#F0FDFA',
+                      borderRadius: 14,
+                      border: '1.5px solid #99F6E4',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: 12,
+                    }}>
+                      <div>
+                        <div style={{ fontSize: '0.78rem', color: '#0F766E', fontWeight: 700 }}>
+                          SELECTED TIME:
+                        </div>
+                        <div style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A' }}>
+                          {new Date(selectedSlot.startAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} ({new Date(selectedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleNext}
+                        className="btn btn-primary"
+                        style={{
+                          padding: '10px 24px',
+                          fontSize: '0.92rem',
+                          fontWeight: 700,
+                          backgroundColor: '#0D9488',
+                          color: '#FFFFFF',
+                          borderRadius: 10,
+                          border: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 14px rgba(13, 148, 136, 0.3)',
+                        }}
+                      >
+                        <span>Continue to Patient Details</span>
+                        <ArrowRightIcon size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1162,15 +1209,25 @@ export default function BookingFlow({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 14,
               paddingTop: 24,
               borderTop: '1px solid #F1F5F9',
-              marginTop: 12,
+              marginTop: 18,
+              width: '100%',
             }}>
               <button
                 type="button"
                 onClick={handleBack}
                 className="btn btn-outline"
-                style={{ padding: '10px 20px', fontSize: '0.88rem' }}
+                style={{
+                  padding: '12px 24px',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
               >
                 <ChevronLeftIcon size={16} />
                 <span>{step === 1 ? 'Cancel' : 'Back'}</span>
@@ -1181,10 +1238,23 @@ export default function BookingFlow({
                   type="button"
                   onClick={handleNext}
                   className="btn btn-primary"
-                  style={{ padding: '10px 24px', fontSize: '0.9rem' }}
+                  style={{
+                    padding: '12px 28px',
+                    fontSize: '0.95rem',
+                    fontWeight: 700,
+                    backgroundColor: '#0D9488',
+                    color: '#FFFFFF',
+                    borderRadius: 12,
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(13, 148, 136, 0.3)',
+                  }}
                 >
-                  <span>Continue</span>
-                  <ArrowRightIcon size={15} />
+                  <span>{step === 5 ? 'Review Summary & Pricing' : 'Continue'}</span>
+                  <ArrowRightIcon size={16} />
                 </button>
               ) : (
                 <button
@@ -1193,13 +1263,21 @@ export default function BookingFlow({
                   onClick={handleConfirmBooking}
                   className="btn btn-primary"
                   style={{
-                    padding: '12px 30px',
-                    fontSize: '0.98rem',
+                    padding: '14px 34px',
+                    fontSize: '1rem',
                     fontWeight: 800,
-                    boxShadow: '0 8px 24px rgba(13, 148, 136, 0.35)',
+                    backgroundColor: '#0D9488',
+                    color: '#FFFFFF',
+                    borderRadius: 12,
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                    boxShadow: '0 8px 24px rgba(13, 148, 136, 0.4)',
                   }}
                 >
-                  <span>{submitting ? 'Reserving Slot...' : 'Confirm & Book Appointment'}</span>
+                  <span>{submitting ? 'Reserving Appointment...' : 'Confirm & Book Appointment Now'}</span>
                   <CheckCircleIcon size={18} />
                 </button>
               )}
