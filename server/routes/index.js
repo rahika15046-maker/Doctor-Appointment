@@ -130,8 +130,8 @@ r.post('/auth/login', wrap(async (req, res) => {
   if (!cleanEmail || !password) {
     throw new ApiError(400, 'Email and password are required');
   }
-  const u = await User.findOne({ email: cleanEmail });
-  if (!u || u.isActive === false) throw new ApiError(401, 'Invalid email or password');
+  const u = await User.findOne({ email: cleanEmail }).select('+password');
+  if (!u || u.isActive === false || !u.password) throw new ApiError(401, 'Invalid email or password');
   
   const valid = await bcrypt.compare(password || '', u.password);
   if (!valid) throw new ApiError(401, 'Invalid email or password');
@@ -200,8 +200,9 @@ r.patch('/auth/change-password', requireAuth, wrap(async (req, res) => {
   if (newPassword.length < 6) {
     throw new ApiError(400, 'New password must be at least 6 characters long');
   }
-  const u = await User.findOne({ _id: req.user._id || req.user.id });
+  const u = await User.findOne({ _id: req.user._id || req.user.id }).select('+password');
   if (!u) throw new ApiError(404, 'User not found');
+  if (!u.password) throw new ApiError(400, 'Password is not set for this account');
 
   const valid = await bcrypt.compare(currentPassword, u.password);
   if (!valid) throw new ApiError(401, 'Current password entered is incorrect');
